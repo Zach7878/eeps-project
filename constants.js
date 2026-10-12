@@ -7,3 +7,6 @@ const PITCH = 0.62;
 const MUFFLE = 0.7;
 
 const MAX_SECONDS = 12;
+
+// Bundled MP3 for original vs Titan playback
+const SAMPLE_FILE = "Beethoven's 5th Symphony.mp3";

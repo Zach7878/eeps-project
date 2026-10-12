@@ -16,7 +16,12 @@ Then go to `http://127.0.0.1:8080/`. Allow microphone access. Chrome or Edge wor
 2. Click **Stop recording**.
 3. Compare **Play on Earth** and **Play on Titan**.
 
-Recordings stop automatically after `MAX_SECONDS`.
+Or skip the mic and use the bundled sample:
+
+1. Click **Play original** for the MP3 as-is.
+2. Click **Play on Titan** for the same track with the pitch/muffle effect (first Titan play may take a bit to process).
+
+Recordings stop automatically after `MAX_SECONDS`. The sample filename is set by `SAMPLE_FILE` in `constants.js`.
 
 ## Tune the Titan voice
 
@@ -27,6 +32,7 @@ Edit **`constants.js`**, refresh the page, and **record again**. The Titan mix i
 | `PITCH` | `0.62` | How low the voice goes. `1` is unchanged. `0.5` is a full octave down. `0.62` is roughly Titan (speed of sound ~194 m/s vs ~343 m/s on Earth). |
 | `MUFFLE` | `0.7` | How thick the air sounds. `0` is almost clear. `1` is very muffled (low-pass + extra bass, less treble). |
 | `MAX_SECONDS` | `12` | Longest recording length. |
+| `SAMPLE_FILE` | `Beethoven's 5th Symphony.mp3` | Bundled track for original vs Titan playback. |
 
 Examples:
 
