@@ -1,14 +1,14 @@
 const recordBtn = document.getElementById("recordBtn");
 const playEarthBtn = document.getElementById("playEarthBtn");
 const playTitanBtn = document.getElementById("playTitanBtn");
-const playSampleEarthBtn = document.getElementById("playSampleEarthBtn");
-const playSampleTitanBtn = document.getElementById("playSampleTitanBtn");
 const pauseSampleBtn = document.getElementById("pauseSampleBtn");
 const stopBtn = document.getElementById("stopBtn");
 const statusEl = document.getElementById("status");
-const sampleNameEl = document.getElementById("sampleName");
+const sampleListEl = document.getElementById("sampleList");
 const canvas = document.getElementById("wave");
 const ctx = canvas.getContext("2d");
+
+const samplePlayers = [];
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
@@ -21,9 +21,6 @@ let mediaRecorder = null;
 let chunks = [];
 let earthBuffer = null;
 let titanBuffer = null;
-let sampleEarthBuffer = null;
-let sampleTitanBuffer = null;
-let sampleTitanPromise = null;
 let playingSource = null;
 let analyser = null;
 let micStream = null;
@@ -144,15 +141,32 @@ function downmixMono(buffer) {
   return mix;
 }
 
-async function titanize(buffer, onProgress) {
+function profileFor(type) {
+  const profiles = typeof TITAN_PROFILES === "object" ? TITAN_PROFILES : {};
+  return profiles[type] || profiles.mixed || { pitch: PITCH, muffle: MUFFLE };
+}
+
+async function titanize(buffer, onProgress, type) {
+  const profile = profileFor(type);
+  const pitch =
+    typeof profile.pitch === "number" ? profile.pitch : PITCH;
+  const muff =
+    Math.min(1, Math.max(0, typeof profile.muffle === "number" ? profile.muffle : muffle));
+
+  const mix = downmixMono(buffer);
+  let processed = mix;
+  if (Math.abs(pitch - 1) > 0.001) {
+    processed = await pitchShiftChannel(mix, pitch, onProgress);
+  } else if (onProgress) {
+    onProgress(1);
+  }
+
   const shifted = getAudioContext().createBuffer(
     1,
-    buffer.length,
+    processed.length,
     buffer.sampleRate
   );
-  const mix = downmixMono(buffer);
-  const shiftedChannel = await pitchShiftChannel(mix, PITCH, onProgress);
-  shifted.copyToChannel(shiftedChannel, 0);
+  shifted.copyToChannel(processed, 0);
 
   const offline = new OfflineAudioContext(
     1,
@@ -164,23 +178,23 @@ async function titanize(buffer, onProgress) {
 
   const lowpass = offline.createBiquadFilter();
   lowpass.type = "lowpass";
-  lowpass.frequency.value = lerp(4200, 700, muffle);
+  lowpass.frequency.value = lerp(4200, 700, muff);
   lowpass.Q.value = 0.65;
 
   const muffler = offline.createBiquadFilter();
   muffler.type = "lowpass";
-  muffler.frequency.value = lerp(8000, 1200, muffle);
+  muffler.frequency.value = lerp(8000, 1200, muff);
   muffler.Q.value = 0.5;
 
   const lowshelf = offline.createBiquadFilter();
   lowshelf.type = "lowshelf";
   lowshelf.frequency.value = 220;
-  lowshelf.gain.value = lerp(0, 6, muffle);
+  lowshelf.gain.value = lerp(0, 6, muff);
 
   const highshelf = offline.createBiquadFilter();
   highshelf.type = "highshelf";
   highshelf.frequency.value = 1800;
-  highshelf.gain.value = lerp(0, -12, muffle);
+  highshelf.gain.value = lerp(0, -12, muff);
 
   source.connect(lowpass);
   lowpass.connect(muffler);
@@ -396,28 +410,6 @@ playTitanBtn.addEventListener("click", () => {
   if (titanBuffer) playBuffer(titanBuffer, "Playing on Titan.");
 });
 
-playSampleEarthBtn.addEventListener("click", () => {
-  if (sampleEarthBuffer) {
-    playBuffer(sampleEarthBuffer, "Playing original sample.", {
-      isSample: true,
-    });
-  }
-});
-
-playSampleTitanBtn.addEventListener("click", async () => {
-  if (!sampleEarthBuffer) return;
-  playSampleTitanBtn.disabled = true;
-  try {
-    const buffer = await getSampleTitanBuffer();
-    playBuffer(buffer, "Playing sample on Titan.", { isSample: true });
-  } catch (err) {
-    setStatus("Could not process the sample for Titan.");
-    console.error(err);
-  } finally {
-    playSampleTitanBtn.disabled = !sampleEarthBuffer;
-  }
-});
-
 pauseSampleBtn.addEventListener("click", () => {
   pauseOrResumeSample();
 });
@@ -427,41 +419,125 @@ stopBtn.addEventListener("click", () => {
   setStatus("Stopped.");
 });
 
-async function getSampleTitanBuffer() {
-  if (sampleTitanBuffer) return sampleTitanBuffer;
-  if (sampleTitanPromise) return sampleTitanPromise;
-  sampleTitanPromise = titanize(sampleEarthBuffer, (p) => {
-    setStatus(`Processing Titan mix… ${Math.round(p * 100)}%`);
-  }).then((buffer) => {
-    sampleTitanBuffer = buffer;
+async function getSampleTitanBuffer(player) {
+  if (player.titanBuffer) return player.titanBuffer;
+  if (player.titanPromise) return player.titanPromise;
+  player.titanPromise = titanize(
+    player.earthBuffer,
+    (p) => {
+      setStatus(`Processing ${player.config.label} for Titan… ${Math.round(p * 100)}%`);
+    },
+    player.config.type
+  ).then((buffer) => {
+    player.titanBuffer = buffer;
     return buffer;
   });
   try {
-    return await sampleTitanPromise;
+    return await player.titanPromise;
   } catch (err) {
-    sampleTitanPromise = null;
+    player.titanPromise = null;
     throw err;
   }
 }
 
-async function loadSample() {
-  if (typeof SAMPLE_FILE !== "string" || !SAMPLE_FILE) return;
-  sampleNameEl.textContent = SAMPLE_FILE.replace(/\.[^.]+$/, "");
-  try {
-    setStatus("Loading sample track…");
-    const response = await fetch(encodeURI(SAMPLE_FILE));
-    if (!response.ok) throw new Error(response.statusText);
-    const data = await response.arrayBuffer();
-    sampleEarthBuffer = await getAudioContext().decodeAudioData(data);
-    playSampleEarthBtn.disabled = false;
-    playSampleTitanBtn.disabled = false;
-    setStatus("Ready. Record, or play the sample.");
-  } catch (err) {
-    sampleNameEl.textContent = "Could not load the sample file.";
-    console.error(err);
+function addSampleCard(player) {
+  const card = document.createElement("article");
+  card.className = "sample-card";
+
+  const title = document.createElement("h3");
+  title.textContent = player.config.label;
+
+  const note = document.createElement("p");
+  note.className = "sample-note";
+  note.textContent = player.config.note || "";
+
+  const controls = document.createElement("div");
+  controls.className = "controls";
+
+  const earthBtn = document.createElement("button");
+  earthBtn.type = "button";
+  earthBtn.className = "btn";
+  earthBtn.textContent = "Play original";
+  earthBtn.disabled = true;
+
+  const titanBtn = document.createElement("button");
+  titanBtn.type = "button";
+  titanBtn.className = "btn titan";
+  titanBtn.textContent = "Play on Titan";
+  titanBtn.disabled = true;
+
+  earthBtn.addEventListener("click", () => {
+    if (player.earthBuffer) {
+      playBuffer(player.earthBuffer, `Playing original: ${player.config.label}.`, {
+        isSample: true,
+      });
+    }
+  });
+
+  titanBtn.addEventListener("click", async () => {
+    if (!player.earthBuffer) return;
+    titanBtn.disabled = true;
+    try {
+      const buffer = await getSampleTitanBuffer(player);
+      playBuffer(buffer, `Playing on Titan: ${player.config.label}.`, {
+        isSample: true,
+      });
+    } catch (err) {
+      setStatus(`Could not process ${player.config.label} for Titan.`);
+      console.error(err);
+    } finally {
+      titanBtn.disabled = !player.earthBuffer;
+    }
+  });
+
+  controls.append(earthBtn, titanBtn);
+  card.append(title, note, controls);
+  sampleListEl.appendChild(card);
+
+  player.earthBtn = earthBtn;
+  player.titanBtn = titanBtn;
+}
+
+async function loadSamples() {
+  const configs = Array.isArray(SAMPLES) ? SAMPLES : [];
+  if (!configs.length || !sampleListEl) return;
+
+  setStatus("Loading sample tracks…");
+  let loaded = 0;
+
+  await Promise.all(
+    configs.map(async (config) => {
+      const player = {
+        config,
+        earthBuffer: null,
+        titanBuffer: null,
+        titanPromise: null,
+        earthBtn: null,
+        titanBtn: null,
+      };
+      samplePlayers.push(player);
+      addSampleCard(player);
+      try {
+        const response = await fetch(encodeURI(config.file));
+        if (!response.ok) throw new Error(response.statusText);
+        const data = await response.arrayBuffer();
+        player.earthBuffer = await getAudioContext().decodeAudioData(data);
+        player.earthBtn.disabled = false;
+        player.titanBtn.disabled = false;
+        loaded += 1;
+      } catch (err) {
+        player.earthBtn.textContent = "Missing file";
+        console.error(err);
+      }
+    })
+  );
+
+  if (loaded) {
+    setStatus("Ready. Record, replay your voice, or play a sample.");
+  } else {
     setStatus("Ready when you are.");
   }
 }
 
 drawIdle();
-loadSample();
+loadSamples();

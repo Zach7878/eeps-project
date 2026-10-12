@@ -96,9 +96,11 @@
           <p class="eyebrow">Pitch</p>
           <h2>Formants drop as you fall toward Titan</h2>
           <p class="pitch-copy">
-            This site scales vocal resonances to about
-            <strong>62%</strong> of Earth pitch — a simple model of that slower
-            speed of sound. Scroll and watch the wave stretch.
+            For a mixed recording or a voice, this studio scales the sound to
+            about <strong id="pitchPct">62%</strong> of Earth pitch — a simple
+            model of that slower speed of sound. Scroll and watch the wave
+            stretch. Wind instruments go further: their pitch itself follows
+            the speed of sound.
           </p>
           <p class="pitch-readout" id="pitchReadout">100%</p>
           <p class="pitch-caption" id="pitchCaption">Earth pitch</p>
@@ -107,6 +109,39 @@
               <path id="formantPath" d="" fill="none" stroke="currentColor" stroke-width="3" />
             </svg>
           </div>
+        </div>
+      </section>
+
+      <section class="chapter" data-reveal>
+        <p class="eyebrow">Instruments</p>
+        <h2>A flute falls. A violin does not.</h2>
+        <p>
+          Pitch on Titan depends on what is actually vibrating. A flute, organ,
+          or trumpet is an air column: the note is set by how fast sound
+          travels inside the tube, so on Titan it plays around a
+          <strong>minor seventh lower</strong> (about 57% of Earth pitch).
+          Strings, piano, and drums are solid things — wood, metal, skin —
+          so they keep their Earth pitch. What changes is the air around them:
+          the same stroke sounds thicker, a little louder, and slightly darker.
+        </p>
+        <p>
+          Your voice sits in between. Vocal cords still vibrate at the same
+          rate, but the mouth and throat resonances drop with the slower air.
+          A mixed recording (a pop song, a full orchestra) blends all of these
+          together, so this site treats those tracks like the voice demo: one
+          pitch drop and one muffle, not a per-instrument rewrite.
+        </p>
+        <div class="instrument-grid">
+          <article class="speed-card">
+            <p class="speed-place">Air column</p>
+            <p class="speed-value">↓ pitch</p>
+            <p class="speed-note">Flute, clarinet, trumpet, organ</p>
+          </article>
+          <article class="speed-card titan-card">
+            <p class="speed-place">Solid vibrator</p>
+            <p class="speed-value">same</p>
+            <p class="speed-note">Violin, guitar, piano, drums</p>
+          </article>
         </div>
       </section>
 
@@ -133,9 +168,11 @@
         <p>
           Real Titan acoustics would include temperature gradients, methane
           humidity, wind, and the exact shape of your vocal tract. The studio
-          below is a browser approximation: a pitch shift for slower sound,
-          plus filters for dense-air muffling. It is meant to make the physics
-          audible, not to replace a planetary acoustics paper.
+          below is a browser approximation: a pitch shift when the physics
+          calls for one (voice, mixed tracks, wind instruments), no pitch
+          shift for strings, plus filters for dense-air muffling. It is meant
+          to make the physics audible, not to replace a planetary acoustics
+          paper.
         </p>
         <a class="btn titan" href="#lab">Hear it yourself</a>
       </section>
@@ -145,8 +182,9 @@
       <p class="eyebrow">Studio</p>
       <h2 class="studio-title">Record, then compare Earth and Titan</h2>
       <p class="lede">
-        Record your voice, or play the bundled symphony. Titan playback uses
-        the slower-sound pitch drop and dense-air muffling from above.
+        Record your voice, or play a sample. Mixed tracks (orchestra, pop)
+        use the same pitch and muffle as your voice. The flute drops further;
+        the violins keep their pitch.
       </p>
 
       <div class="viz">
@@ -170,15 +208,12 @@
       </div>
 
       <section class="sample">
-        <h2>Sample track</h2>
-        <p id="sampleName" class="sample-name"></p>
+        <h2>Sample tracks</h2>
+        <p class="sample-name">
+          Pause and stop apply to whichever track is playing.
+        </p>
+        <div id="sampleList" class="sample-list"></div>
         <div class="controls">
-          <button id="playSampleEarthBtn" type="button" class="btn" disabled>
-            Play original
-          </button>
-          <button id="playSampleTitanBtn" type="button" class="btn titan" disabled>
-            Play on Titan
-          </button>
           <button id="pauseSampleBtn" type="button" class="btn ghost" disabled>
             Pause
           </button>

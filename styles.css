@@ -279,7 +279,8 @@ body {
   font-size: 1.25rem;
 }
 
-.speed-grid {
+.speed-grid,
+.instrument-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.85rem;
@@ -561,6 +562,37 @@ canvas {
   font-size: 0.9rem;
 }
 
+.sample-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.sample-card {
+  padding: 1rem 1rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(8, 4, 2, 0.35);
+}
+
+.sample-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.sample-card .sample-note {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.sample-card .controls {
+  margin-bottom: 0;
+}
+
 @media (max-width: 600px) {
   .panel {
     margin: 1.5rem 1rem 3rem;
@@ -568,7 +600,8 @@ canvas {
   }
 
   .stats,
-  .speed-grid {
+  .speed-grid,
+  .instrument-grid {
     grid-template-columns: 1fr;
   }
 

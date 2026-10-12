@@ -1,4 +1,8 @@
 const TITAN_PITCH = typeof PITCH === "number" ? PITCH : 0.62;
+const pitchPctEl = document.getElementById("pitchPct");
+if (pitchPctEl) {
+  pitchPctEl.textContent = `${Math.round(TITAN_PITCH * 100)}%`;
+}
 
 const progressEl = document.getElementById("scrollProgress");
 const saturn = document.querySelector(".saturn");
