@@ -3,7 +3,7 @@
 // PITCH:  1 = original, 0.5 = one octave lower, 0.62 ≈ Titan (mixed / voice)
 // MUFFLE: 0 = clear, 1 = very muffled (thick atmosphere)
 
-const PITCH = 0.62;
+const PITCH = 0.57;
 const MUFFLE = 0.7;
 
 const MAX_SECONDS = 12;
