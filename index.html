@@ -1,10 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>My Website</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice on Titan</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Hello, world!</h1>
-    <p>My website is live!</p>
+    <div class="haze"></div>
+    <div class="saturn" aria-hidden="true"></div>
+
+    <main class="panel">
+      <p class="eyebrow">Saturn’s moon · −179°C · 1.45 bar</p>
+      <h1>How would you sound on Titan?</h1>
+      <p class="lede">
+        Titan’s air is colder, thicker, and slower for sound than Earth’s.
+        Record your voice, then hear it with a lower pitch and a muffled,
+        dense-atmosphere tone.
+      </p>
+
+      <div class="viz">
+        <canvas id="wave" width="640" height="120" aria-hidden="true"></canvas>
+        <p id="status" class="status">Ready when you are.</p>
+      </div>
+
+      <div class="controls">
+        <button id="recordBtn" type="button" class="btn primary">
+          Record
+        </button>
+        <button id="playEarthBtn" type="button" class="btn" disabled>
+          Play on Earth
+        </button>
+        <button id="playTitanBtn" type="button" class="btn titan" disabled>
+          Play on Titan
+        </button>
+        <button id="stopBtn" type="button" class="btn ghost" disabled>
+          Stop
+        </button>
+      </div>
+
+      <section class="science">
+        <h2>Why it sounds different</h2>
+        <ul>
+          <li>
+            <strong>Lower pitch.</strong> Sound travels at about 194 m/s on
+            Titan versus 343 m/s on Earth, so vocal-tract resonances drop
+            (here, to about 62% of your original pitch).
+          </li>
+          <li>
+            <strong>Muffled.</strong> The dense nitrogen–methane air damps
+            high frequencies, so the playback is low-passed and slightly
+            bass-heavy.
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="constants.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
