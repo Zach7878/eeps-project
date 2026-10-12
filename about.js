@@ -1,4 +1,4 @@
-const TITAN_PITCH = typeof PITCH === "number" ? PITCH : 0.62;
+const TITAN_PITCH = typeof PITCH === "number" ? PITCH : 0.57;
 const pitchPctEl = document.getElementById("pitchPct");
 if (pitchPctEl) {
   pitchPctEl.textContent = `${Math.round(TITAN_PITCH * 100)}%`;

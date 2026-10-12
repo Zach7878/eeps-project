@@ -1,6 +1,6 @@
 // Tweak these two numbers, then refresh and record again.
 //
-// PITCH:  1 = original, 0.5 = one octave lower, 0.62 ≈ Titan (mixed / voice)
+// PITCH:  1 = original, 0.5 = one octave lower, 0.57 ≈ Titan (mixed / voice)
 // MUFFLE: 0 = clear, 1 = very muffled (thick atmosphere)
 
 const PITCH = 0.57;
