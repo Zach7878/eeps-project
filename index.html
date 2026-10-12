@@ -7,16 +7,146 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="haze"></div>
-    <div class="saturn" aria-hidden="true"></div>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
-    <main class="panel">
-      <p class="eyebrow">Saturn’s moon · −179°C · 1.45 bar</p>
-      <h1>How would you sound on Titan?</h1>
+    <div class="sky" aria-hidden="true">
+      <div class="haze"></div>
+      <div class="saturn"></div>
+      <div class="titan-moon"></div>
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="cloud c3"></div>
+    </div>
+
+    <header class="about">
+      <section class="hero">
+        <p class="eyebrow">Cassini–Huygens · Saturn’s largest moon</p>
+        <h1>How would you sound on Titan?</h1>
+        <p class="lede hero-lede">
+          Titan is the only moon with a thick, Earth-like atmosphere: a cold
+          nitrogen–methane ocean of air. Sound moves differently there. Scroll
+          to hear why, then try your own voice.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#lab">Skip to studio</a>
+          <span class="scroll-hint">
+            <span class="chevron" aria-hidden="true"></span>
+            Read the science
+          </span>
+        </div>
+      </section>
+
+      <section class="chapter" data-reveal>
+        <p class="eyebrow">The world</p>
+        <h2>A moon with weather, lakes, and air you could almost wade through</h2>
+        <p>
+          In 2005, the Huygens probe dropped through Titan’s haze and landed in
+          a floodplain of icy gravel. The air it fell through was mostly
+          nitrogen, laced with methane, at about <strong>1.45 bar</strong> —
+          denser than Earth’s — and a surface temperature near
+          <strong>−179°C</strong>.
+        </p>
+        <p>
+          That combination is rare. Cold gas is sluggish. Dense gas is heavy.
+          Together they change how pressure waves travel, which is all sound
+          really is.
+        </p>
+        <dl class="stats">
+          <div>
+            <dt>Temperature</dt>
+            <dd>−179°C</dd>
+          </div>
+          <div>
+            <dt>Surface pressure</dt>
+            <dd>1.45 bar</dd>
+          </div>
+          <div>
+            <dt>Air</dt>
+            <dd>N<sub>2</sub> + CH<sub>4</sub></dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="chapter" data-reveal>
+        <p class="eyebrow">Speed of sound</p>
+        <h2>Sound is slower in the cold</h2>
+        <p>
+          On Earth, sound runs at about 343 meters per second. On Titan’s
+          surface it is closer to <strong>194 m/s</strong>. Your vocal tract is
+          a set of resonant cavities. Those resonances (formants) scale with
+          how fast sound can bounce around inside them. Slow the air down, and
+          the same mouth and throat ring lower.
+        </p>
+        <div class="speed-grid">
+          <article class="speed-card earth">
+            <p class="speed-place">Earth</p>
+            <p class="speed-value">343<span>m/s</span></p>
+            <p class="speed-note">Warm nitrogen–oxygen air</p>
+          </article>
+          <article class="speed-card titan-card">
+            <p class="speed-place">Titan</p>
+            <p class="speed-value">194<span>m/s</span></p>
+            <p class="speed-note">Cold, dense nitrogen–methane</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="pitch-stage" id="pitchStage">
+        <div class="pitch-sticky">
+          <p class="eyebrow">Pitch</p>
+          <h2>Formants drop as you fall toward Titan</h2>
+          <p class="pitch-copy">
+            This site scales vocal resonances to about
+            <strong>62%</strong> of Earth pitch — a simple model of that slower
+            speed of sound. Scroll and watch the wave stretch.
+          </p>
+          <p class="pitch-readout" id="pitchReadout">100%</p>
+          <p class="pitch-caption" id="pitchCaption">Earth pitch</p>
+          <div class="formant-wave" aria-hidden="true">
+            <svg id="formantSvg" viewBox="0 0 640 120" preserveAspectRatio="none">
+              <path id="formantPath" d="" fill="none" stroke="currentColor" stroke-width="3" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" data-reveal>
+        <p class="eyebrow">Timbre</p>
+        <h2>Thick air eats the treble</h2>
+        <p>
+          Density does more than slow the wave. High frequencies scatter and
+          damp more readily in Titan’s heavy nitrogen–methane mix, so the
+          sound arrives muffled: less sparkle, a little more bass. That is why
+          playback here is low-passed and slightly shelf-boosted at the low
+          end — not because Titan is “evil,” but because thick cold air is a
+          blunt instrument.
+        </p>
+        <div class="spectrum" id="spectrum" aria-hidden="true"></div>
+        <p class="spectrum-caption">
+          High frequencies fade first. What remains is the muffled Titan tone.
+        </p>
+      </section>
+
+      <section class="chapter caveat" data-reveal>
+        <p class="eyebrow">Honesty</p>
+        <h2>This is a listening sketch, not a full simulation</h2>
+        <p>
+          Real Titan acoustics would include temperature gradients, methane
+          humidity, wind, and the exact shape of your vocal tract. The studio
+          below is a browser approximation: a pitch shift for slower sound,
+          plus filters for dense-air muffling. It is meant to make the physics
+          audible, not to replace a planetary acoustics paper.
+        </p>
+        <a class="btn titan" href="#lab">Hear it yourself</a>
+      </section>
+    </header>
+
+    <main class="panel" id="lab">
+      <p class="eyebrow">Studio</p>
+      <h2 class="studio-title">Record, then compare Earth and Titan</h2>
       <p class="lede">
-        Titan’s air is colder, thicker, and slower for sound than Earth’s.
-        Record your voice, then hear it with a lower pitch and a muffled,
-        dense-atmosphere tone.
+        Record your voice, or play the bundled symphony. Titan playback uses
+        the slower-sound pitch drop and dense-air muffling from above.
       </p>
 
       <div class="viz">
@@ -54,25 +184,10 @@
           </button>
         </div>
       </section>
-
-      <section class="science">
-        <h2>Why it sounds different</h2>
-        <ul>
-          <li>
-            <strong>Lower pitch.</strong> Sound travels at about 194 m/s on
-            Titan versus 343 m/s on Earth, so vocal-tract resonances drop
-            (here, to about 62% of your original pitch).
-          </li>
-          <li>
-            <strong>Muffled.</strong> The dense nitrogen–methane air damps
-            high frequencies, so the playback is low-passed and slightly
-            bass-heavy.
-          </li>
-        </ul>
-      </section>
     </main>
 
     <script src="constants.js"></script>
+    <script src="about.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
