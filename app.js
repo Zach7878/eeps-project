@@ -3,6 +3,7 @@ const playEarthBtn = document.getElementById("playEarthBtn");
 const playTitanBtn = document.getElementById("playTitanBtn");
 const playSampleEarthBtn = document.getElementById("playSampleEarthBtn");
 const playSampleTitanBtn = document.getElementById("playSampleTitanBtn");
+const pauseSampleBtn = document.getElementById("pauseSampleBtn");
 const stopBtn = document.getElementById("stopBtn");
 const statusEl = document.getElementById("status");
 const sampleNameEl = document.getElementById("sampleName");
@@ -28,6 +29,13 @@ let analyser = null;
 let micStream = null;
 let rafId = 0;
 let recording = false;
+let playOffset = 0;
+let playStartedAt = 0;
+let currentBuffer = null;
+let currentLabel = "";
+let paused = false;
+let pausing = false;
+let playingSample = false;
 
 function setStatus(text) {
   statusEl.textContent = text;
@@ -183,15 +191,28 @@ async function titanize(buffer, onProgress) {
   return offline.startRendering();
 }
 
+function resetSamplePauseUi() {
+  paused = false;
+  pausing = false;
+  playingSample = false;
+  playOffset = 0;
+  currentBuffer = null;
+  currentLabel = "";
+  pauseSampleBtn.textContent = "Pause";
+  pauseSampleBtn.disabled = true;
+}
+
 function stopPlayback() {
-  if (playingSource) {
+  pausing = true;
+  const source = playingSource;
+  playingSource = null;
+  if (source) {
     try {
-      playingSource.stop();
+      source.stop();
     } catch {
       /* already stopped */
     }
-    playingSource.disconnect();
-    playingSource = null;
+    source.disconnect();
   }
   if (analyser && !recording) {
     analyser.disconnect();
@@ -200,9 +221,12 @@ function stopPlayback() {
     drawIdle();
   }
   stopBtn.disabled = true;
+  resetSamplePauseUi();
 }
 
-function playBuffer(buffer, label) {
+function playBuffer(buffer, label, options = {}) {
+  const offset = Math.max(0, options.offset || 0);
+  const isSample = !!options.isSample;
   stopPlayback();
   const ac = getAudioContext();
   if (ac.state === "suspended") ac.resume();
@@ -214,20 +238,67 @@ function playBuffer(buffer, label) {
   source.connect(analyser);
   analyser.connect(ac.destination);
   playingSource = source;
+  currentBuffer = buffer;
+  currentLabel = label;
+  playOffset = offset;
+  playStartedAt = ac.currentTime;
+  paused = false;
+  pausing = false;
+  playingSample = isSample;
+  pauseSampleBtn.textContent = "Pause";
+  pauseSampleBtn.disabled = !isSample;
   stopBtn.disabled = false;
   setStatus(label);
   tickMeter();
   source.onended = () => {
+    if (pausing) return;
     if (playingSource === source) {
       playingSource = null;
       analyser = null;
       cancelAnimationFrame(rafId);
       drawIdle();
       stopBtn.disabled = true;
+      resetSamplePauseUi();
       setStatus("Ready. Record, replay your voice, or play the sample.");
     }
   };
-  source.start();
+  const safeOffset = Math.min(offset, Math.max(0, buffer.duration - 0.01));
+  source.start(0, safeOffset);
+}
+
+function pauseOrResumeSample() {
+  if (paused && currentBuffer) {
+    playBuffer(currentBuffer, currentLabel, {
+      offset: playOffset,
+      isSample: true,
+    });
+    return;
+  }
+  if (!playingSource || !playingSample || !currentBuffer) return;
+
+  const ac = getAudioContext();
+  playOffset += ac.currentTime - playStartedAt;
+  if (playOffset >= currentBuffer.duration) {
+    stopPlayback();
+    setStatus("Ready. Record, replay your voice, or play the sample.");
+    return;
+  }
+
+  pausing = true;
+  try {
+    playingSource.stop();
+  } catch {
+    /* already stopped */
+  }
+  playingSource.disconnect();
+  playingSource = null;
+  paused = true;
+  pausing = false;
+  cancelAnimationFrame(rafId);
+  pauseSampleBtn.textContent = "Resume";
+  pauseSampleBtn.disabled = false;
+  stopBtn.disabled = false;
+  setStatus("Paused.");
 }
 
 function pickMimeType() {
@@ -327,7 +398,9 @@ playTitanBtn.addEventListener("click", () => {
 
 playSampleEarthBtn.addEventListener("click", () => {
   if (sampleEarthBuffer) {
-    playBuffer(sampleEarthBuffer, "Playing original sample.");
+    playBuffer(sampleEarthBuffer, "Playing original sample.", {
+      isSample: true,
+    });
   }
 });
 
@@ -336,13 +409,17 @@ playSampleTitanBtn.addEventListener("click", async () => {
   playSampleTitanBtn.disabled = true;
   try {
     const buffer = await getSampleTitanBuffer();
-    playBuffer(buffer, "Playing sample on Titan.");
+    playBuffer(buffer, "Playing sample on Titan.", { isSample: true });
   } catch (err) {
     setStatus("Could not process the sample for Titan.");
     console.error(err);
   } finally {
     playSampleTitanBtn.disabled = !sampleEarthBuffer;
   }
+});
+
+pauseSampleBtn.addEventListener("click", () => {
+  pauseOrResumeSample();
 });
 
 stopBtn.addEventListener("click", () => {
