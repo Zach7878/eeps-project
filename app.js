@@ -143,7 +143,7 @@ function downmixMono(buffer) {
 
 function profileFor(type) {
   const profiles = typeof TITAN_PROFILES === "object" ? TITAN_PROFILES : {};
-  return profiles[type] || profiles.mixed || { pitch: PITCH, muffle: MUFFLE };
+  return profiles[type] || profiles.voice || { pitch: PITCH, muffle: MUFFLE };
 }
 
 async function titanize(buffer, onProgress, type) {

@@ -3,18 +3,17 @@
 // PITCH:  1 = original, 0.5 = one octave lower, 0.57 ≈ Titan (mixed / voice)
 // MUFFLE: 0 = clear, 1 = very muffled (thick atmosphere)
 
-const PITCH = 0.57;
 const MUFFLE = 0.7;
 
 const MAX_SECONDS = 12;
 
 const SOUND_SPEED_EARTH = 343; // m/s
 const SOUND_SPEED_TITAN = 194; // m/s
+const PITCH = SOUND_SPEED_TITAN / SOUND_SPEED_EARTH;
 const AIR_PITCH = SOUND_SPEED_TITAN / SOUND_SPEED_EARTH; // ≈ 0.57
 
 const TITAN_PROFILES = {
   // Mixed recordings and voice: same pitch-down + muffling as before
-  mixed: { pitch: PITCH, muffle: MUFFLE },
   voice: { pitch: PITCH, muffle: MUFFLE },
   // Air-column instruments (flute, trumpet, organ): pitch follows sound speed
   air: { pitch: AIR_PITCH, muffle: MUFFLE },
@@ -24,16 +23,10 @@ const TITAN_PROFILES = {
 
 const SAMPLES = [
   {
-    file: "Beethoven's 5th Symphony.mp3",
-    label: "Beethoven's 5th Symphony",
+    file: "Payphone - Maroon 5 (Acapella - Vocals Only).mp3",
+    label: "Payphone - Maroon 5",
     type: "mixed",
-    note: "Full orchestra — mixed, so Titan uses the same pitch and muffle as your voice.",
-  },
-  {
-    file: "Call Me Maybe.mp3",
-    label: "Call Me Maybe",
-    type: "mixed",
-    note: "Pop mix — same default Titan treatment as the orchestra.",
+    note: "Isolated vocals from Maroon 5's pop song Payphone",
   },
   {
     file: "Sirens.mp3",
