@@ -3,15 +3,14 @@
 // PITCH:  1 = original, 0.5 = one octave lower, 0.57 ≈ Titan (mixed / voice)
 // MUFFLE: 0 = clear, 1 = very muffled (thick atmosphere)
 
-const MUFFLE = 0.7;
+const MUFFLE = 0;
 
 const MAX_SECONDS = 12;
 
 const SOUND_SPEED_EARTH = 343; // m/s
 const SOUND_SPEED_TITAN = 194; // m/s
-const PITCH = SOUND_SPEED_TITAN / SOUND_SPEED_EARTH;
-const AIR_PITCH = SOUND_SPEED_TITAN / SOUND_SPEED_EARTH; // ≈ 0.57
-
+const PITCH = 0.5612
+const AIR_PITCH = 0.5612
 const TITAN_PROFILES = {
   // Mixed recordings and voice: same pitch-down + muffling as before
   voice: { pitch: PITCH, muffle: MUFFLE },
@@ -25,7 +24,7 @@ const SAMPLES = [
   {
     file: "Payphone - Maroon 5 (Acapella - Vocals Only).mp3",
     label: "Payphone - Maroon 5",
-    type: "mixed",
+    type: "voice",
     note: "Isolated vocals from Maroon 5's pop song Payphone",
   },
   {
