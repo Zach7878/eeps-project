@@ -95,7 +95,11 @@ body {
   z-index: 1;
   margin: 0 0 0.5rem;
   font-size: clamp(2.4rem, 8vw, 4rem);
-  font-weight: 500;
+  font-family: system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: 0.045em;
+  color: #f2d6ae;
+  text-shadow: 0 2px 18px rgba(224, 122, 58, 0.32);
 }
 
 .globe-intro,
@@ -140,6 +144,7 @@ body {
   position: relative;
   z-index: 1;
   margin: auto 0 0;
+  transform: translateY(0.75rem);
   font-family: system-ui, sans-serif;
   font-size: 0.82rem;
 }
@@ -149,6 +154,7 @@ body {
   z-index: 1;
   min-height: 2.8rem;
   margin-top: 0.25rem;
+  transform: translateY(0.75rem);
   font-family: system-ui, sans-serif;
   font-size: 0.78rem;
   line-height: 1.4;
