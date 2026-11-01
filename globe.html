@@ -23,9 +23,28 @@
 
     <main class="globe-page">
       <section class="globe-content">
-        <p class="eyebrow">Explore the moon</p>
-        <h1>Meet Titan</h1>
-        <p class="globe-intro">Drag the globe to turn Titan and explore its hazy, orange world.</p>
+        <h1>Titan</h1>
+        <figure id="krakenImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="KRAKEN MARE.png"
+            alt="Radar image showing Kraken Mare, a large dark hydrocarbon sea surrounded by Titan's bright terrain."
+          />
+          <figcaption>Kraken Mare · NASA/JPL-Caltech/ASI/USGS, via Wikimedia Commons</figcaption>
+        </figure>
+        <figure id="ligeiaImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="ligeia mare.png"
+            alt="False-color radar mosaic of Ligeia Mare, a large dark sea in Titan's north polar region."
+          />
+          <figcaption>Ligeia Mare · NASA/JPL-Caltech/ASI/Cornell, via Wikimedia Commons</figcaption>
+        </figure>
+        <figure id="huygensImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="250px-Huygens_surface_color_sr.png"
+            alt="Huygens probe's surface view of Titan's hazy horizon and rounded icy pebbles."
+          />
+          <figcaption>Huygens landing site · ESA/NASA/JPL/University of Arizona; processed by Andrey Pivovarov</figcaption>
+        </figure>
         <canvas
           id="titanGlobe"
           class="titan-globe"
@@ -40,6 +59,178 @@
           <p id="globeHoverCoordinates" aria-hidden="true">Hover over Titan to see coordinates</p>
           <p id="globeSelectedCoordinates" aria-live="polite">Click Titan to select coordinates</p>
         </div>
+        <aside
+          id="krakenInfo"
+          class="globe-info"
+          aria-labelledby="krakenTitle"
+          aria-describedby="krakenDescription"
+          hidden
+        >
+          <button
+            id="closeKrakenInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Kraken Mare information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Titan's largest sea</p>
+          <h2 id="krakenTitle">Kraken Mare</h2>
+          <p id="krakenDescription">
+            A vast sea of liquid methane and ethane near Titan's north pole.
+            Named for the legendary sea monster, it is the largest known lake
+            in the Solar System. Cassini observations confirmed its liquid
+            surface and revealed an intricate network of basins and estuaries.
+            A 2014 bright ring around the shoreline suggests the sea was once
+            larger and has since shrunk through evaporation. NASA has also
+            studied a robotic submarine concept for exploring the sea.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>68°N, 310°W</dd></div>
+            <div><dt>Length</dt><dd>About 1,170 km</dd></div>
+            <div><dt>Estimated area</dt><dd>400,000–500,000 km²</dd></div>
+            <div><dt>Depth</dt><dd>Moray Sinus: about 85 m; main basin: at least 100 m, possibly 300 m or more</dd></div>
+            <div><dt>Moray Sinus liquid</dt><dd>About 70% methane, 16% nitrogen, 14% ethane</dd></div>
+            <div><dt>Discovered</dt><dd>By Cassini in 2006; named in 2008</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources: USGS Gazetteer of Planetary Nomenclature; Poggiali et al.
+            (2020); NASA/JPL Photojournal PIA18432; NASA NTRS submarine study.
+          </p>
+        </aside>
+        <aside
+          id="huygensInfo"
+          class="globe-info"
+          aria-labelledby="huygensTitle"
+          aria-describedby="huygensDescription"
+          hidden
+        >
+          <button
+            id="closeHuygensInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Huygens landing site information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Historic spacecraft landing site</p>
+          <h2 id="huygensTitle">Huygens Landing Site</h2>
+          <p id="huygensDescription">
+            On January 14, 2005, ESA's Huygens probe became the first spacecraft
+            to successfully land on Titan. Its descent images revealed a dry
+            riverbed-like landscape near the boundary of Adiri's bright
+            highlands and Shangri-La's dark lowlands. Rounded, pebble-like
+            water-ice objects and branching channels show how flowing methane
+            and ethane have shaped the surface. Huygens transmitted data for
+            about 72 minutes after landing, providing the first direct
+            measurements and images from Titan's surface.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>10.3°S, 192.32°W</dd></div>
+            <div><dt>Location</dt><dd>Between Adiri and Shangri-La</dd></div>
+            <div><dt>Landing date</dt><dd>January 14, 2005</dd></div>
+            <div><dt>Mission</dt><dd>Cassini–Huygens; ESA's Huygens probe</dd></div>
+            <div><dt>Temperature</dt><dd>About −179°C</dd></div>
+            <div><dt>Surface</dt><dd>Water-ice pebbles, dark plains, drainage channels and organic compounds</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://science.nasa.gov/resource/huygens-landing-site-2/" target="_blank" rel="noreferrer">NASA Science</a>,
+            <a href="https://photojournal.jpl.nasa.gov/" target="_blank" rel="noreferrer">NASA/JPL Photojournal</a>,
+            <a href="https://www.esa.int/Science_Exploration/Space_Science/Cassini-Huygens" target="_blank" rel="noreferrer">ESA</a>,
+            <a href="https://www.usgs.gov/" target="_blank" rel="noreferrer">USGS</a> and
+            <a href="https://science.nasa.gov/mission/cassini/" target="_blank" rel="noreferrer">NASA Cassini–Huygens</a>.
+          </p>
+        </aside>
+        <aside
+          id="ligeiaInfo"
+          class="globe-info"
+          aria-labelledby="ligeiaTitle"
+          aria-describedby="ligeiaDescription"
+          hidden
+        >
+          <button
+            id="closeLigeiaInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Ligeia Mare information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Titan's second-largest sea</p>
+          <h2 id="ligeiaTitle">Ligeia Mare</h2>
+          <p id="ligeiaDescription">
+            Ligeia Mare is Titan's second-largest sea, a vast body of liquid
+            hydrocarbons near the north pole. Cassini radar detected the
+            seabed for the first time in a sea beyond Earth, measuring depths
+            of about 160 m along its deepest observed path. The radar signal
+            passed readily through the liquid, suggesting a methane-rich
+            composition. Rivers, including the more than 400 km-long Vid
+            Flumina, flow into the sea. Cassini also observed a transient
+            bright feature nicknamed the “magic island,” possibly caused by
+            waves, bubbles, or floating material.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>79°N, 248°W</dd></div>
+            <div><dt>Length</dt><dd>About 500 km</dd></div>
+            <div><dt>Area</dt><dd>About 130,000 km²</dd></div>
+            <div><dt>Maximum measured depth</dt><dd>About 160 m</dd></div>
+            <div><dt>Composition</dt><dd>Mostly methane, with ethane and dissolved nitrogen</dd></div>
+            <div><dt>Name</dt><dd>Ligeia, a siren in Greek mythology</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources: USGS Gazetteer of Planetary Nomenclature; Mastrogiuseppe
+            et al. (2014); ESA (2016); NASA/JPL Photojournal PIA20021.
+          </p>
+        </aside>
+        <aside
+          id="selkInfo"
+          class="globe-info"
+          aria-labelledby="selkTitle"
+          aria-describedby="selkDescription"
+          hidden
+        >
+          <button
+            id="closeSelkInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Selk Crater information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Ancient impact crater</p>
+          <h2 id="selkTitle">Selk Crater</h2>
+          <p id="selkDescription">
+            Selk is an approximately 80–90 km-wide impact crater near Titan's
+            equatorial dune fields, about 800 km north-northwest of the
+            Huygens landing site. Cassini observations show a bright rim, a
+            central depression, surrounding ejecta and channels shaped by
+            erosion. The impact may have melted Titan's icy crust, creating
+            temporary pools of water mixed with surface organics. Models
+            suggest the pools could have lasted thousands to tens of
+            thousands of years, creating a possible setting for prebiotic
+            chemistry. NASA's Dragonfly mission is planned to explore the
+            region and investigate its surface chemistry.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>About 7°N, 199°W</dd></div>
+            <div><dt>Location</dt><dd>Near Titan's equatorial dune fields</dd></div>
+            <div><dt>Diameter</dt><dd>About 80–90 km</dd></div>
+            <div><dt>Crater type</dt><dd>Impact crater</dd></div>
+            <div><dt>Impact model</dt><dd>About 4 km-wide icy impactor; 200–400 km³ of melt estimated</dd></div>
+            <div><dt>Surface features</dt><dd>Bright rim, central depression, ejecta and drainage channels</dd></div>
+            <div><dt>Significance</dt><dd>Potential interactions between liquid water and organic compounds</dd></div>
+            <div><dt>Future exploration</dt><dd>NASA's Dragonfly mission</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://science.nasa.gov/solar-system/nasas-dragonfly-mission-sets-sights-on-titans-mysteries/" target="_blank" rel="noreferrer">NASA Science</a>,
+            <a href="https://www.usgs.gov/publications/geology-selk-crater-region-titan-cassini-vims-observations" target="_blank" rel="noreferrer">USGS</a>,
+            <a href="https://doi.org/10.3847/PSJ/acbe40" target="_blank" rel="noreferrer">Wakita et al. (2023)</a>,
+            <a href="https://www.nasa.gov/missions/cassini/impact-craters-reveal-details-of-titans-dynamic-surface-weathering/" target="_blank" rel="noreferrer">NASA</a> and
+            <a href="https://ntrs.nasa.gov/citations/20210011126" target="_blank" rel="noreferrer">NASA NTRS Dragonfly landing-site study</a>.
+          </p>
+        </aside>
       </section>
     </main>
     <script src="globe.js"></script>

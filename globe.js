@@ -1,5 +1,27 @@
 const globe = document.getElementById("titanGlobe");
+const globeContent = document.querySelector(".globe-content");
+const krakenImagePanel = document.getElementById("krakenImagePanel");
+const ligeiaImagePanel = document.getElementById("ligeiaImagePanel");
+const huygensImagePanel = document.getElementById("huygensImagePanel");
 const context = globe.getContext("2d");
+const locationInfos = {
+  kraken: {
+    element: document.getElementById("krakenInfo"),
+    closeButton: document.getElementById("closeKrakenInfo"),
+  },
+  huygens: {
+    element: document.getElementById("huygensInfo"),
+    closeButton: document.getElementById("closeHuygensInfo"),
+  },
+  ligeia: {
+    element: document.getElementById("ligeiaInfo"),
+    closeButton: document.getElementById("closeLigeiaInfo"),
+  },
+  selk: {
+    element: document.getElementById("selkInfo"),
+    closeButton: document.getElementById("closeSelkInfo"),
+  },
+};
 const textureImage = new Image();
 let texturePixels;
 let textureWidth = 0;
@@ -21,6 +43,36 @@ let lastPointerY = 0;
 let pointerIsOverGlobe = false;
 let renderScheduled = false;
 let pendingRenderScale = 1;
+const krakenMare = {
+  id: "kraken",
+  name: "Kraken Mare",
+  latitude: 68,
+  longitudeWest: 310,
+};
+const huygensLandingSite = {
+  id: "huygens",
+  name: "Huygens Landing Site",
+  latitude: -10.3,
+  longitudeWest: 192.32,
+};
+const ligeiaMare = {
+  id: "ligeia",
+  name: "Ligeia Mare",
+  latitude: 79,
+  longitudeWest: 248,
+};
+const selkCrater = {
+  id: "selk",
+  name: "Selk Crater",
+  latitude: 7,
+  longitudeWest: 199,
+};
+const locations = [krakenMare, huygensLandingSite, ligeiaMare, selkCrater];
+const locationImagePanels = {
+  kraken: krakenImagePanel,
+  huygens: huygensImagePanel,
+  ligeia: ligeiaImagePanel,
+};
 
 function scheduleDraw(scale = 1) {
   pendingRenderScale = scale;
@@ -75,7 +127,8 @@ function drawGlobe(renderScale = 1) {
       const longitude = Math.atan2(rotatedX, finalZ);
       const latitude = Math.asin(Math.max(-1, Math.min(1, rotatedY)));
       const textureX =
-        ((1 - longitude / (Math.PI * 2)) * textureWidth) % textureWidth;
+        ((longitude / (Math.PI * 2)) * textureWidth + textureWidth) %
+        textureWidth;
       const textureY = (0.5 - latitude / Math.PI) * (textureHeight - 1);
       const x0 = Math.floor(textureX);
       const x1 = (x0 + 1) % textureWidth;
@@ -118,6 +171,69 @@ function drawGlobe(renderScale = 1) {
   context.strokeStyle = "rgba(240, 178, 116, 0.45)";
   context.lineWidth = 2;
   context.stroke();
+  for (const location of locations) {
+    drawLocationMarker(location);
+  }
+}
+
+function projectCoordinates(latitude, longitude) {
+  const latitudeRadians = latitude * Math.PI / 180;
+  const longitudeRadians = (360 - longitude) * Math.PI / 180;
+  const geographicX = Math.cos(latitudeRadians) * Math.sin(longitudeRadians);
+  const geographicY = Math.sin(latitudeRadians);
+  const geographicZ = Math.cos(latitudeRadians) * Math.cos(longitudeRadians);
+
+  const rotatedZ =
+    -geographicY * Math.sin(tilt) + geographicZ * Math.cos(tilt);
+  const x = geographicX * Math.cos(rotation) - rotatedZ * Math.sin(rotation);
+  const y =
+    geographicY * Math.cos(tilt) +
+    geographicZ * Math.sin(tilt);
+  const z = geographicX * Math.sin(rotation) + rotatedZ * Math.cos(rotation);
+
+  return {
+    x: center + x * radius,
+    y: center - y * radius,
+    visible: z > 0,
+  };
+}
+
+function drawLocationMarker(location) {
+  const point = projectCoordinates(location.latitude, location.longitudeWest);
+  if (!point.visible) return;
+
+  const markerSize = Math.max(5, size * (location.id === "huygens" ? 0.01 : 0.012));
+  context.save();
+  context.lineWidth = Math.max(2, size * 0.004);
+  context.strokeStyle = "#fff1d8";
+  context.fillStyle =
+    location.id === "huygens"
+      ? "#71d7d1"
+      : location.id === "ligeia"
+        ? "#77d6e8"
+        : location.id === "selk"
+          ? "#e8d16f"
+          : "#e07a3a";
+  context.shadowColor = "rgba(0, 0, 0, 0.8)";
+  context.shadowBlur = markerSize;
+  context.beginPath();
+  context.arc(point.x, point.y, markerSize, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+  context.beginPath();
+  context.arc(point.x, point.y, markerSize * 2, 0, Math.PI * 2);
+  context.strokeStyle = "rgba(255, 241, 216, 0.75)";
+  context.stroke();
+  context.font = `600 ${Math.max(12, size * 0.027)}px system-ui, sans-serif`;
+  context.textAlign = point.x > center ? "right" : "left";
+  context.textBaseline = "middle";
+  context.fillStyle = "#fff1d8";
+  context.fillText(
+    location.name,
+    point.x + (point.x > center ? -markerSize * 2.8 : markerSize * 2.8),
+    point.y,
+  );
+  context.restore();
 }
 
 function getCoordinatesAtPointer(clientX, clientY) {
@@ -142,16 +258,18 @@ function getCoordinatesAtPointer(clientX, clientY) {
   const geographicX = rotatedX;
   const longitudeRadians = Math.atan2(geographicX, geographicZ);
   const latitudeRadians = Math.asin(Math.max(-1, Math.min(1, geographicY)));
-  const longitude = ((longitudeRadians * 180 / Math.PI) % 360 + 360) % 360;
+  const longitudeEast =
+    ((longitudeRadians * 180 / Math.PI) % 360 + 360) % 360;
+  const longitudeWest = (360 - longitudeEast) % 360;
   const latitude = latitudeRadians * 180 / Math.PI;
 
-  return { latitude, longitude };
+  return { latitude, longitude: longitudeWest };
 }
 
 function formatCoordinates(coordinates) {
   const latitudeHemisphere = coordinates.latitude < 0 ? "S" : "N";
   const longitude = Math.round(coordinates.longitude * 100) / 100 % 360;
-  return `${Math.abs(coordinates.latitude).toFixed(2)}° ${latitudeHemisphere}, ${longitude.toFixed(2)}° E`;
+  return `${Math.abs(coordinates.latitude).toFixed(2)}° ${latitudeHemisphere}, ${longitude.toFixed(2)}° W`;
 }
 
 function updateHoverCoordinates(clientX, clientY) {
@@ -159,6 +277,32 @@ function updateHoverCoordinates(clientX, clientY) {
   globeHoverCoordinates.textContent = coordinates
     ? `Hover: ${formatCoordinates(coordinates)}`
     : "Hover over Titan to see coordinates";
+}
+
+function positionLocationInfo(element) {
+  const contentBounds = globeContent.getBoundingClientRect();
+  const globeBounds = globe.getBoundingClientRect();
+  const globeRight = globeBounds.left + globeBounds.width * 0.93;
+  const availableWidth = Math.max(0, contentBounds.right - globeRight);
+  const sidePadding = Math.min(10, availableWidth / 3);
+  const cardWidth = Math.max(0, Math.min(440, availableWidth - sidePadding * 2));
+  const cardCenter = globeRight + availableWidth / 2;
+
+  element.style.left = `${cardCenter - cardWidth / 2 - contentBounds.left}px`;
+  element.style.width = `${cardWidth}px`;
+}
+
+function positionLocationImage(element) {
+  const contentBounds = globeContent.getBoundingClientRect();
+  const globeBounds = globe.getBoundingClientRect();
+  const globeLeft = globeBounds.left + globeBounds.width * 0.07;
+  const availableWidth = Math.max(0, globeLeft - contentBounds.left);
+  const sidePadding = Math.min(16, availableWidth / 3);
+  const panelWidth = Math.max(0, Math.min(320, availableWidth - sidePadding * 2));
+  const panelCenter = contentBounds.left + availableWidth / 2;
+
+  element.style.left = `${panelCenter - panelWidth / 2 - contentBounds.left}px`;
+  element.style.width = `${panelWidth}px`;
 }
 
 const globeHoverCoordinates = document.getElementById("globeHoverCoordinates");
@@ -223,9 +367,60 @@ globe.addEventListener("click", (event) => {
     const coordinates = getCoordinatesAtPointer(event.clientX, event.clientY);
     if (coordinates) {
       globeSelectedCoordinates.textContent = `Selected: ${formatCoordinates(coordinates)}`;
+      const bounds = globe.getBoundingClientRect();
+      for (const location of locations) {
+        const marker = projectCoordinates(
+          location.latitude,
+          location.longitudeWest,
+        );
+        const markerX = bounds.left + marker.x / globe.width * bounds.width;
+        const markerY = bounds.top + marker.y / globe.height * bounds.height;
+        const markerHitRadius = Math.max(14, bounds.width * 0.025);
+        if (
+          marker.visible &&
+          Math.hypot(event.clientX - markerX, event.clientY - markerY) <=
+            markerHitRadius
+        ) {
+          for (const { element } of Object.values(locationInfos)) {
+            element.hidden = true;
+          }
+          for (const [locationId, panel] of Object.entries(locationImagePanels)) {
+            panel.hidden = locationId !== location.id;
+          }
+          const info = locationInfos[location.id];
+          positionLocationInfo(info.element);
+          const imagePanel = locationImagePanels[location.id];
+          if (imagePanel) positionLocationImage(imagePanel);
+          info.element.hidden = false;
+          info.closeButton.focus();
+          break;
+        }
+      }
     }
   }
   pointerMoved = false;
+});
+
+for (const info of Object.values(locationInfos)) {
+  info.closeButton.addEventListener("click", () => {
+    info.element.hidden = true;
+    const locationId = Object.keys(locationInfos).find(
+      (id) => locationInfos[id] === info,
+    );
+    if (locationId && locationImagePanels[locationId]) {
+      locationImagePanels[locationId].hidden = true;
+    }
+    globe.focus();
+  });
+}
+
+window.addEventListener("resize", () => {
+  for (const { element } of Object.values(locationInfos)) {
+    if (!element.hidden) positionLocationInfo(element);
+  }
+  for (const panel of Object.values(locationImagePanels)) {
+    if (!panel.hidden) positionLocationImage(panel);
+  }
 });
 
 globe.addEventListener("keydown", (event) => {

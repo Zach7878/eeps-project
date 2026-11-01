@@ -116,7 +116,7 @@ body {
 
 .titan-globe {
   position: absolute;
-  top: 59%;
+  top: 51%;
   left: 50%;
   width: min(92vw, 84svh, 60rem);
   height: auto;
@@ -161,6 +161,133 @@ body {
 
 .globe-coordinates p + p {
   color: var(--text);
+}
+
+.globe-info {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 0;
+  right: auto;
+  width: min(22rem, calc(100% - 1.5rem));
+  max-height: calc(100% - 2rem);
+  overflow-y: auto;
+  padding: 1.35rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(22, 12, 8, 0.96);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5);
+  text-align: left;
+  transform: translateY(-50%);
+}
+
+.globe-info[hidden] {
+  display: none;
+}
+
+.globe-image-panel {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 0;
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(22, 12, 8, 0.96);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
+  transform: translateY(-50%);
+}
+
+.globe-image-panel[hidden] {
+  display: none;
+}
+
+.globe-image-panel img {
+  display: block;
+  width: 100%;
+  max-height: 72svh;
+  border-radius: 0.55rem;
+  object-fit: contain;
+}
+
+.globe-image-panel figcaption {
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.globe-info-close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.65rem;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.globe-info h2 {
+  margin: 0 2rem 0.55rem 0;
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+.globe-info > p:not(.eyebrow, .globe-info-source) {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.globe-info-facts {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.globe-info-facts div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.globe-info-facts dt {
+  color: var(--accent);
+}
+
+.globe-info-facts dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.globe-info-source {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.globe-info-source a {
+  color: var(--text);
+  text-underline-offset: 0.15em;
+}
+
+.globe-info-source a:hover {
+  color: var(--accent);
 }
 
 .sky {
@@ -712,6 +839,16 @@ canvas {
 }
 
 @media (max-width: 600px) {
+  .globe-info {
+    width: min(22rem, calc(100% - 1rem));
+    padding: 1rem;
+  }
+
+  .globe-info-facts div {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
   .panel {
     margin: 1.5rem 1rem 3rem;
     padding: 1.5rem 1.15rem 1.75rem;
