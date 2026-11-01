@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Globe | Voice on Titan</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="globe.html" aria-current="page">Globe</a>
+    </nav>
+
+    <div class="sky" aria-hidden="true">
+      <div class="haze"></div>
+      <div class="saturn"></div>
+      <div class="titan-moon"></div>
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="cloud c3"></div>
+    </div>
+
+    <main class="globe-page">
+      <section class="globe-content">
+        <p class="eyebrow">Explore the moon</p>
+        <h1>Meet Titan</h1>
+        <p class="globe-intro">Drag the globe to turn Titan and explore its hazy, orange world.</p>
+        <canvas
+          id="titanGlobe"
+          class="titan-globe"
+          width="420"
+          height="420"
+          role="img"
+          aria-label="Interactive illustration of Titan. Drag to rotate."
+          tabindex="0"
+        ></canvas>
+        <p class="globe-hint">Drag to rotate · Use the arrow keys to explore</p>
+      </section>
+    </main>
+    <script src="globe.js"></script>
+  </body>
+</html>

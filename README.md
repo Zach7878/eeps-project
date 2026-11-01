@@ -2,6 +2,8 @@
 
 A small HTML, CSS, and JavaScript site that records your voice and plays it back as it might sound on Titan, Saturn’s moon: **lower pitch** and **muffled**.
 
+The **Globe** tab features a rotatable illustration of Titan.
+
 ## Run it
 
 Open `index.html` in a browser, or serve the folder locally (needed on some browsers for the microphone):
@@ -57,6 +59,7 @@ This is an approximation in the browser, not a full acoustic simulation.
 | File | Role |
 | --- | --- |
 | `index.html` | Page layout |
+| `globe.html` | Globe page |
 | `styles.css` | Titan-themed styling |
 | `constants.js` | Pitch, muffle, and recording length |
 | `app.js` | Mic recording, pitch shift, filters, playback |
