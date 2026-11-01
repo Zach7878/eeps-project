@@ -144,6 +144,25 @@ body {
   font-size: 0.82rem;
 }
 
+.globe-coordinates {
+  position: relative;
+  z-index: 1;
+  min-height: 2.8rem;
+  margin-top: 0.25rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.globe-coordinates p {
+  margin: 0;
+}
+
+.globe-coordinates p + p {
+  color: var(--text);
+}
+
 .sky {
   position: fixed;
   inset: 0;

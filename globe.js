@@ -14,6 +14,11 @@ let tilt = -0.12;
 let dragging = false;
 let previousX = 0;
 let previousY = 0;
+let pointerStartX = 0;
+let pointerStartY = 0;
+let lastPointerX = 0;
+let lastPointerY = 0;
+let pointerIsOverGlobe = false;
 let renderScheduled = false;
 let pendingRenderScale = 1;
 
@@ -69,7 +74,8 @@ function drawGlobe(renderScale = 1) {
       const finalZ = y * sinTilt + rotatedZ * cosTilt;
       const longitude = Math.atan2(rotatedX, finalZ);
       const latitude = Math.asin(Math.max(-1, Math.min(1, rotatedY)));
-      const textureX = ((longitude / (Math.PI * 2) + 0.5) * textureWidth) % textureWidth;
+      const textureX =
+        ((1 - longitude / (Math.PI * 2)) * textureWidth) % textureWidth;
       const textureY = (0.5 - latitude / Math.PI) * (textureHeight - 1);
       const x0 = Math.floor(textureX);
       const x1 = (x0 + 1) % textureWidth;
@@ -114,21 +120,85 @@ function drawGlobe(renderScale = 1) {
   context.stroke();
 }
 
+function getCoordinatesAtPointer(clientX, clientY) {
+  const bounds = globe.getBoundingClientRect();
+  const pointerX = ((clientX - bounds.left) / bounds.width) * globe.width;
+  const pointerY = ((clientY - bounds.top) / bounds.height) * globe.height;
+  const x = (pointerX - center) / radius;
+  const y = (center - pointerY) / radius;
+  const distance = x * x + y * y;
+  if (distance > 1) return null;
+
+  const z = Math.sqrt(1 - distance);
+  const sinRotation = Math.sin(rotation);
+  const cosRotation = Math.cos(rotation);
+  const sinTilt = Math.sin(tilt);
+  const cosTilt = Math.cos(tilt);
+
+  const rotatedX = x * cosRotation + z * sinRotation;
+  const rotatedZ = z * cosRotation - x * sinRotation;
+  const geographicY = y * cosTilt - rotatedZ * sinTilt;
+  const geographicZ = y * sinTilt + rotatedZ * cosTilt;
+  const geographicX = rotatedX;
+  const longitudeRadians = Math.atan2(geographicX, geographicZ);
+  const latitudeRadians = Math.asin(Math.max(-1, Math.min(1, geographicY)));
+  const longitude = ((longitudeRadians * 180 / Math.PI) % 360 + 360) % 360;
+  const latitude = latitudeRadians * 180 / Math.PI;
+
+  return { latitude, longitude };
+}
+
+function formatCoordinates(coordinates) {
+  const latitudeHemisphere = coordinates.latitude < 0 ? "S" : "N";
+  const longitude = Math.round(coordinates.longitude * 100) / 100 % 360;
+  return `${Math.abs(coordinates.latitude).toFixed(2)}° ${latitudeHemisphere}, ${longitude.toFixed(2)}° E`;
+}
+
+function updateHoverCoordinates(clientX, clientY) {
+  const coordinates = getCoordinatesAtPointer(clientX, clientY);
+  globeHoverCoordinates.textContent = coordinates
+    ? `Hover: ${formatCoordinates(coordinates)}`
+    : "Hover over Titan to see coordinates";
+}
+
+const globeHoverCoordinates = document.getElementById("globeHoverCoordinates");
+const globeSelectedCoordinates = document.getElementById("globeSelectedCoordinates");
+let pointerMoved = false;
+
 globe.addEventListener("pointerdown", (event) => {
   dragging = true;
+  pointerMoved = false;
+  pointerStartX = event.clientX;
+  pointerStartY = event.clientY;
+  lastPointerX = event.clientX;
+  lastPointerY = event.clientY;
+  pointerIsOverGlobe = true;
   previousX = event.clientX;
   previousY = event.clientY;
   globe.setPointerCapture(event.pointerId);
 });
 
 globe.addEventListener("pointermove", (event) => {
-  if (!dragging) return;
-  const scale = 0.008;
-  rotation -= (event.clientX - previousX) * scale;
-  tilt = Math.max(-0.75, Math.min(0.75, tilt - (event.clientY - previousY) * scale));
-  previousX = event.clientX;
-  previousY = event.clientY;
-  scheduleDraw(0.5);
+  if (dragging) {
+    const deltaX = event.clientX - previousX;
+    const deltaY = event.clientY - previousY;
+    if (
+      Math.abs(event.clientX - pointerStartX) > 3 ||
+      Math.abs(event.clientY - pointerStartY) > 3
+    ) {
+      pointerMoved = true;
+    }
+    const scale = 0.008;
+    rotation -= deltaX * scale;
+    tilt = Math.max(-0.75, Math.min(0.75, tilt - deltaY * scale));
+    previousX = event.clientX;
+    previousY = event.clientY;
+    scheduleDraw(0.5);
+  }
+  lastPointerX = event.clientX;
+  lastPointerY = event.clientY;
+  pointerIsOverGlobe = true;
+  updateHoverCoordinates(lastPointerX, lastPointerY);
 });
 
 globe.addEventListener("pointerup", () => {
@@ -139,6 +209,23 @@ globe.addEventListener("pointerup", () => {
 globe.addEventListener("pointercancel", () => {
   dragging = false;
   scheduleDraw();
+});
+
+globe.addEventListener("pointerleave", () => {
+  if (!dragging) {
+    pointerIsOverGlobe = false;
+    globeHoverCoordinates.textContent = "Hover over Titan to see coordinates";
+  }
+});
+
+globe.addEventListener("click", (event) => {
+  if (!pointerMoved) {
+    const coordinates = getCoordinatesAtPointer(event.clientX, event.clientY);
+    if (coordinates) {
+      globeSelectedCoordinates.textContent = `Selected: ${formatCoordinates(coordinates)}`;
+    }
+  }
+  pointerMoved = false;
 });
 
 globe.addEventListener("keydown", (event) => {
@@ -155,6 +242,9 @@ globe.addEventListener("keydown", (event) => {
   rotation += change[0];
   tilt = Math.max(-0.75, Math.min(0.75, tilt + change[1]));
   scheduleDraw();
+  if (pointerIsOverGlobe) {
+    updateHoverCoordinates(lastPointerX, lastPointerY);
+  }
 });
 
 window.addEventListener("resize", resizeGlobe);
