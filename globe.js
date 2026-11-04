@@ -9,6 +9,11 @@ const xanaduImagePanel = document.getElementById("xanaduImagePanel");
 const sotraImagePanel = document.getElementById("sotraImagePanel");
 const hoteiImagePanel = document.getElementById("hoteiImagePanel");
 const menrvaImagePanel = document.getElementById("menrvaImagePanel");
+const shangriLaImagePanel = document.getElementById("shangri-laImagePanel");
+const mithrimImagePanel = document.getElementById("mithrimImagePanel");
+const pungaImagePanel = document.getElementById("pungaImagePanel");
+const vidFluminaImagePanel = document.getElementById("vidFluminaImagePanel");
+const jingpoImagePanel = document.getElementById("jingpoImagePanel");
 const context = globe.getContext("2d");
 const locationInfos = {
   kraken: {
@@ -46,6 +51,26 @@ const locationInfos = {
   menrva: {
     element: document.getElementById("menrvaInfo"),
     closeButton: document.getElementById("closeMenrvaInfo"),
+  },
+  shangriLa: {
+    element: document.getElementById("shangriLaInfo"),
+    closeButton: document.getElementById("closeShangriLaInfo"),
+  },
+  mithrim: {
+    element: document.getElementById("mithrimInfo"),
+    closeButton: document.getElementById("closeMithrimInfo"),
+  },
+  punga: {
+    element: document.getElementById("pungaInfo"),
+    closeButton: document.getElementById("closePungaInfo"),
+  },
+  vidFlumina: {
+    element: document.getElementById("vidFluminaInfo"),
+    closeButton: document.getElementById("closeVidFluminaInfo"),
+  },
+  jingpo: {
+    element: document.getElementById("jingpoInfo"),
+    closeButton: document.getElementById("closeJingpoInfo"),
   },
 };
 const textureImage = new Image();
@@ -123,6 +148,36 @@ const menrva = {
   latitude: 20.1,
   longitudeWest: 87.2,
 };
+const shangriLa = {
+  id: "shangriLa",
+  name: "Shangri-La",
+  latitude: 0,
+  longitudeWest: 175,
+};
+const mithrimMontes = {
+  id: "mithrim",
+  name: "Mithrim Montes",
+  latitude: -3,
+  longitudeWest: 126,
+};
+const pungaMare = {
+  id: "punga",
+  name: "Punga Mare",
+  latitude: 85,
+  longitudeWest: 340,
+};
+const vidFlumina = {
+  id: "vidFlumina",
+  name: "Vid Flumina",
+  latitude: 73,
+  longitudeWest: 242.5,
+};
+const jingpoLacus = {
+  id: "jingpo",
+  name: "Jingpo Lacus",
+  latitude: 73,
+  longitudeWest: 336,
+};
 const locations = [
   krakenMare,
   huygensLandingSite,
@@ -133,6 +188,11 @@ const locations = [
   sotraPatera,
   hoteiRegio,
   menrva,
+  shangriLa,
+  mithrimMontes,
+  pungaMare,
+  vidFlumina,
+  jingpoLacus,
 ];
 const locationImagePanels = {
   kraken: krakenImagePanel,
@@ -144,6 +204,11 @@ const locationImagePanels = {
   sotra: sotraImagePanel,
   hotei: hoteiImagePanel,
   menrva: menrvaImagePanel,
+  shangriLa: shangriLaImagePanel,
+  mithrim: mithrimImagePanel,
+  punga: pungaImagePanel,
+  vidFlumina: vidFluminaImagePanel,
+  jingpo: jingpoImagePanel,
 };
 
 function scheduleDraw(scale = 1) {
@@ -295,7 +360,17 @@ function drawLocationMarker(location) {
                   ? "#a3e6bc"
                   : location.id === "menrva"
                     ? "#f5a6bf"
-          : "#e07a3a";
+                    : location.id === "shangriLa"
+                      ? "#e9c46a"
+                      : location.id === "mithrim"
+                        ? "#9dc9ff"
+                        : location.id === "punga"
+                          ? "#84d9a5"
+                          : location.id === "vidFlumina"
+                            ? "#8de0e8"
+                            : location.id === "jingpo"
+                              ? "#8fb9ff"
+                              : "#e07a3a";
   context.shadowColor = "rgba(0, 0, 0, 0.8)";
   context.shadowBlur = markerSize;
   context.beginPath();
