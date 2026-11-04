@@ -11,6 +11,15 @@
       <a class="nav-link" href="index.html">Home</a>
       <a class="nav-link" href="globe.html" aria-current="page">Globe</a>
     </nav>
+    <button
+      id="featureCategoryToggle"
+      class="feature-category-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="featureCategoryPanel"
+    >
+      Categories
+    </button>
 
     <div class="sky" aria-hidden="true">
       <div class="haze"></div>
@@ -23,7 +32,41 @@
 
     <main class="globe-page">
       <section class="globe-content">
-        <h1>Titan</h1>
+        <div class="globe-stage">
+          <h1>Titan</h1>
+          <aside
+            id="featureCategoryPanel"
+            class="feature-category-panel"
+            aria-label="Titan feature categories"
+            hidden
+          >
+            <p class="eyebrow">Surface categories</p>
+            <p id="featureBrowserStatus" class="feature-browser-status" role="status">
+              Loading named surface features…
+            </p>
+            <div class="feature-category-bulk-actions">
+              <button
+                id="featureCategorySelectAll"
+                class="feature-category-select-all"
+                type="button"
+              >
+                Select all
+              </button>
+              <button
+                id="featureCategoryUnselectAll"
+                class="feature-category-select-all"
+                type="button"
+              >
+                Unselect all
+              </button>
+            </div>
+            <div
+              id="featureCategoryList"
+              class="feature-category-list"
+              role="group"
+              aria-label="Filter features by category"
+            ></div>
+          </aside>
         <figure id="krakenImagePanel" class="globe-image-panel" hidden>
           <img
             src="KRAKEN MARE.png"
@@ -134,7 +177,7 @@
         <p class="globe-hint">Drag to rotate · Use the arrow keys to explore</p>
         <div class="globe-coordinates">
           <p id="globeHoverCoordinates" aria-hidden="true">Hover over Titan to see coordinates</p>
-          <p id="globeSelectedCoordinates" aria-live="polite">Click Titan to select coordinates</p>
+          <p id="globeSelectedCoordinates" aria-live="polite">Choose a feature or click Titan to select coordinates</p>
         </div>
         <aside
           id="krakenInfo"
@@ -749,6 +792,25 @@
             Barnes et al. (2011), “Wave constraints for Titan's Jingpo Lacus and Kraken Mare from VIMS specular reflection lightcurves.”
           </p>
         </aside>
+        <aside
+          id="namedFeatureInfo"
+          class="globe-info"
+          aria-labelledby="namedFeatureTitle"
+          hidden
+        >
+          <button
+            id="closeNamedFeatureInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close feature information"
+          >
+            ×
+          </button>
+          <p id="namedFeatureCategory" class="eyebrow"></p>
+          <h2 id="namedFeatureTitle"></h2>
+          <dl id="namedFeatureFacts" class="globe-info-facts"></dl>
+        </aside>
+        </div>
       </section>
     </main>
     <script src="globe.js"></script>

@@ -6,7 +6,7 @@ The **Globe** tab features a rotatable illustration of Titan.
 
 ## Run it
 
-Open `index.html` in a browser, or serve the folder locally (needed on some browsers for the microphone):
+Serve the folder locally to use the full site. The globe loads its named-feature catalog from the JSON file, which browsers do not allow pages opened with `file://` to fetch:
 
 ```bash
 python -m http.server 8080

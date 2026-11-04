@@ -1,5 +1,16 @@
 const globe = document.getElementById("titanGlobe");
-const globeContent = document.querySelector(".globe-content");
+const globeContent = document.querySelector(".globe-stage");
+const featureCategoryList = document.getElementById("featureCategoryList");
+const featureCategoryToggle = document.getElementById("featureCategoryToggle");
+const featureCategoryPanel = document.getElementById("featureCategoryPanel");
+const featureCategorySelectAll = document.getElementById("featureCategorySelectAll");
+const featureCategoryUnselectAll = document.getElementById("featureCategoryUnselectAll");
+const featureBrowserStatus = document.getElementById("featureBrowserStatus");
+const namedFeatureInfo = document.getElementById("namedFeatureInfo");
+const namedFeatureCategory = document.getElementById("namedFeatureCategory");
+const namedFeatureTitle = document.getElementById("namedFeatureTitle");
+const namedFeatureFacts = document.getElementById("namedFeatureFacts");
+const closeNamedFeatureInfo = document.getElementById("closeNamedFeatureInfo");
 const krakenImagePanel = document.getElementById("krakenImagePanel");
 const ligeiaImagePanel = document.getElementById("ligeiaImagePanel");
 const huygensImagePanel = document.getElementById("huygensImagePanel");
@@ -94,6 +105,11 @@ let lastPointerY = 0;
 let pointerIsOverGlobe = false;
 let renderScheduled = false;
 let pendingRenderScale = 1;
+let namedFeatures = [];
+const selectedCategories = new Set(["Major Features"]);
+const categoryColors = new Map();
+let selectedFeatureId = null;
+let namedFeatureCategories = [];
 const krakenMare = {
   id: "kraken",
   name: "Kraken Mare",
@@ -211,6 +227,339 @@ const locationImagePanels = {
   jingpo: jingpoImagePanel,
 };
 
+function getVisibleLocations() {
+  return [
+    ...(selectedCategories.has("Major Features") ? locations : []),
+    ...namedFeatures.filter((feature) => selectedCategories.has(feature.category)),
+  ];
+}
+
+function parseFeatureCoordinates(value) {
+  const coordinates = String(value).split("/")[0].replace(/\uFEFF/g, " ");
+  const match = coordinates.match(
+    /(\d+(?:\.\d+)?)\s*°\s*(?:(\d+(?:\.\d+)?)\s*[′'’]\s*)?(?:(\d+(?:\.\d+)?)\s*[″"”]\s*)?([NS])\s+(\d+(?:\.\d+)?)\s*°\s*(?:(\d+(?:\.\d+)?)\s*[′'’]\s*)?(?:(\d+(?:\.\d+)?)\s*[″"”]\s*)?([EW])/i,
+  );
+  if (!match) return null;
+
+  const toDecimalDegrees = (degrees, minutes, seconds) =>
+    Number(degrees) +
+    Number(minutes || 0) / 60 +
+    Number(seconds || 0) / 3600;
+  const latitude =
+    toDecimalDegrees(match[1], match[2], match[3]) *
+    (match[4].toUpperCase() === "S" ? -1 : 1);
+  const longitude =
+    toDecimalDegrees(match[5], match[6], match[7]) *
+    (match[8].toUpperCase() === "W" ? 1 : -1);
+
+  return {
+    latitude,
+    longitudeWest: ((longitude % 360) + 360) % 360,
+  };
+}
+
+function getFeatureName(record) {
+  const metadataFields = new Set([
+    "coordinates",
+    "approval date",
+    "diameter (km)",
+    "length (km)",
+    "liquid body",
+    "ref",
+    "named after",
+    "informal name",
+    "source of name",
+  ]);
+  const entry = Object.entries(record).find(([field, value]) => {
+    const normalizedField = field
+      .replace(/\s*\[note \d+\]$/i, "")
+      .toLowerCase();
+    return !metadataFields.has(normalizedField) &&
+      typeof value === "string" &&
+      value.trim();
+  });
+  if (!entry) throw new Error("A feature record is missing its name.");
+  return entry[1].trim();
+}
+
+function hideFeatureInfo() {
+  namedFeatureInfo.hidden = true;
+  for (const { element } of Object.values(locationInfos)) {
+    element.hidden = true;
+  }
+  for (const panel of Object.values(locationImagePanels)) {
+    panel.hidden = true;
+  }
+}
+
+function addFeatureFact(label, value) {
+  const row = document.createElement("div");
+  const term = document.createElement("dt");
+  const description = document.createElement("dd");
+  term.textContent = label;
+  description.textContent = value;
+  row.append(term, description);
+  namedFeatureFacts.append(row);
+}
+
+function showNamedFeatureInfo(feature) {
+  hideFeatureInfo();
+  namedFeatureCategory.textContent = feature.category;
+  namedFeatureTitle.textContent = feature.name;
+  namedFeatureFacts.replaceChildren();
+  addFeatureFact(
+    "Coordinates",
+    formatCoordinates({
+      latitude: feature.latitude,
+      longitude: feature.longitudeWest,
+    }),
+  );
+
+  for (const [field, value] of Object.entries(feature.record)) {
+    if (value === null || field === "Coordinates" || field === "Ref") continue;
+    if (String(value).trim() === feature.name) continue;
+    const label = field.replace(/\s*\[note \d+\]/gi, "").trim();
+    addFeatureFact(label, String(value));
+  }
+  if (feature.record.Ref) addFeatureFact("Source", feature.record.Ref);
+
+  positionLocationInfo(namedFeatureInfo);
+  namedFeatureInfo.hidden = false;
+  closeNamedFeatureInfo.focus();
+}
+
+function selectLocation(location) {
+  selectedFeatureId = location.id;
+  globeSelectedCoordinates.textContent =
+    `Selected: ${formatCoordinates({ latitude: location.latitude, longitude: location.longitudeWest })}`;
+
+  if (location.kind === "named") {
+    showNamedFeatureInfo(location);
+    return;
+  }
+
+  hideFeatureInfo();
+  const info = locationInfos[location.id];
+  if (!info) return;
+  const imagePanel = locationImagePanels[location.id];
+  positionLocationInfo(info.element);
+  if (imagePanel) {
+    positionLocationImage(imagePanel);
+    imagePanel.hidden = false;
+  }
+  info.element.hidden = false;
+  info.closeButton.focus();
+}
+
+function updateFeatureBrowserStatus() {
+  const visibleCount = getVisibleLocations().length;
+  const categoryCount = selectedCategories.size;
+  featureBrowserStatus.textContent = categoryCount
+    ? `Showing ${visibleCount} features from ${categoryCount} ${categoryCount === 1 ? "category" : "categories"}.`
+    : "No categories selected. Choose a category to show its features.";
+}
+
+function renderFeatureBrowser() {
+  const categories = [
+    { name: "Major Features", features: locations },
+    ...namedFeatureCategories,
+  ];
+  featureCategoryList.replaceChildren();
+
+  for (const category of categories) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "feature-category-button";
+    button.dataset.category = category.name;
+    button.textContent = `${category.name} (${category.features.length})`;
+    button.setAttribute(
+      "aria-label",
+      `${category.name}, ${category.features.length} features`,
+    );
+    button.setAttribute(
+      "aria-pressed",
+      String(selectedCategories.has(category.name)),
+    );
+    button.style.setProperty(
+      "--category-color",
+      categoryColors.get(category.name) || "var(--accent)",
+    );
+    if (category.description) {
+      const description = document.createElement("span");
+      description.className = "feature-category-description";
+      description.id = `feature-category-description-${namedFeatureCategories.indexOf(category)}`;
+      description.textContent = category.description;
+      button.setAttribute("aria-describedby", description.id);
+      button.append(description);
+    }
+    button.addEventListener("click", () => {
+      if (selectedCategories.has(category.name)) {
+        selectedCategories.delete(category.name);
+      } else {
+        selectedCategories.add(category.name);
+      }
+      button.setAttribute(
+        "aria-pressed",
+        String(selectedCategories.has(category.name)),
+      );
+      if (
+        selectedFeatureId &&
+        !getVisibleLocations().some((location) => location.id === selectedFeatureId)
+      ) {
+        selectedFeatureId = null;
+        hideFeatureInfo();
+        globeSelectedCoordinates.textContent =
+          "Choose a feature or click a visible marker to view its coordinates";
+      }
+      updateFeatureBrowserStatus();
+      scheduleDraw();
+    });
+    featureCategoryList.append(button);
+  }
+
+  updateFeatureBrowserStatus();
+}
+
+function setAllCategoriesSelected(shouldSelect) {
+  const categories = [
+    { name: "Major Features" },
+    ...namedFeatureCategories,
+  ];
+  selectedCategories.clear();
+  if (shouldSelect) {
+    for (const category of categories) {
+      selectedCategories.add(category.name);
+    }
+  } else {
+    selectedFeatureId = null;
+    hideFeatureInfo();
+    globeSelectedCoordinates.textContent =
+      "Choose a feature or click a visible marker to view its coordinates";
+  }
+
+  for (const button of featureCategoryList.querySelectorAll(
+    ".feature-category-button",
+  )) {
+    button.setAttribute(
+      "aria-pressed",
+      String(selectedCategories.has(button.dataset.category)),
+    );
+  }
+  updateFeatureBrowserStatus();
+  scheduleDraw();
+}
+
+featureCategorySelectAll.addEventListener("click", () => {
+  setAllCategoriesSelected(true);
+});
+
+featureCategoryUnselectAll.addEventListener("click", () => {
+  setAllCategoriesSelected(false);
+});
+
+function positionFeatureCategoryPanel() {
+  const stageBounds = globeContent.getBoundingClientRect();
+  const globeBounds = globe.getBoundingClientRect();
+  const panelWidth = featureCategoryPanel.getBoundingClientRect().width;
+  const centeredLeft = (globeBounds.left - panelWidth) / 2;
+  const viewportLeft = Math.max(
+    8,
+    Math.min(centeredLeft, window.innerWidth - panelWidth - 8),
+  );
+  featureCategoryPanel.style.left = `${viewportLeft - stageBounds.left}px`;
+}
+
+featureCategoryToggle.addEventListener("click", () => {
+  const isOpen = featureCategoryToggle.getAttribute("aria-expanded") === "true";
+  featureCategoryToggle.setAttribute("aria-expanded", String(!isOpen));
+  featureCategoryPanel.hidden = isOpen;
+  if (!isOpen) positionFeatureCategoryPanel();
+});
+
+featureCategoryPanel.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    featureCategoryPanel.hidden = true;
+    featureCategoryToggle.setAttribute("aria-expanded", "false");
+    featureCategoryToggle.focus();
+  }
+});
+
+async function loadNamedFeatures() {
+  const [featureResponse, descriptionResponse] = await Promise.all([
+    fetch("cleaned%20up%20titan%20features.json"),
+    fetch("titan_geological_features.json"),
+  ]);
+  if (!featureResponse.ok) {
+    throw new Error(`Feature catalog request failed (${featureResponse.status}).`);
+  }
+  if (!descriptionResponse.ok) {
+    throw new Error(
+      `Category description request failed (${descriptionResponse.status}).`,
+    );
+  }
+  const [data, descriptionData] = await Promise.all([
+    featureResponse.json(),
+    descriptionResponse.json(),
+  ]);
+  if (!data.categories || typeof data.categories !== "object") {
+    throw new Error("The feature catalog has no categories.");
+  }
+  if (!descriptionData.categories || typeof descriptionData.categories !== "object") {
+    throw new Error("The category description catalog has no categories.");
+  }
+
+  let nextId = 0;
+  namedFeatureCategories = Object.entries(data.categories).map(
+    ([category, records]) => {
+      if (!Array.isArray(records)) {
+        throw new Error(`The "${category}" category is not a feature list.`);
+      }
+      const features = records.map((record) => {
+        const name = getFeatureName(record);
+        const coordinates = parseFeatureCoordinates(record.Coordinates);
+        if (!coordinates) {
+          throw new Error(`Could not read coordinates for "${name}".`);
+        }
+        return {
+          id: `named-${nextId++}`,
+          kind: "named",
+          name,
+          category,
+          record,
+          ...coordinates,
+        };
+      });
+      const description = descriptionData.categories[category]?.description;
+      if (typeof description !== "string" || !description.trim()) {
+        throw new Error(`The "${category}" category has no description.`);
+      }
+      return { name: category, description, features };
+    },
+  );
+  namedFeatures = namedFeatureCategories.flatMap(
+    (category) => category.features,
+  );
+  categoryColors.clear();
+  const categories = [
+    { name: "Major Features" },
+    ...namedFeatureCategories,
+  ];
+  const hueBuckets = Array.from({ length: 24 }, (_, index) => index);
+  for (let index = hueBuckets.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [hueBuckets[index], hueBuckets[swapIndex]] = [
+      hueBuckets[swapIndex],
+      hueBuckets[index],
+    ];
+  }
+  for (const [index, category] of categories.entries()) {
+    const hue = hueBuckets[index] * 15 + Math.random() * 7;
+    categoryColors.set(category.name, `hsl(${hue} 78% 64%)`);
+  }
+  renderFeatureBrowser();
+  scheduleDraw();
+}
+
 function scheduleDraw(scale = 1) {
   pendingRenderScale = scale;
   if (renderScheduled) return;
@@ -308,7 +657,7 @@ function drawGlobe(renderScale = 1) {
   context.strokeStyle = "rgba(240, 178, 116, 0.45)";
   context.lineWidth = 2;
   context.stroke();
-  for (const location of locations) {
+  for (const location of getVisibleLocations()) {
     drawLocationMarker(location);
   }
 }
@@ -344,33 +693,7 @@ function drawLocationMarker(location) {
   context.lineWidth = Math.max(2, size * 0.004);
   context.strokeStyle = "#fff1d8";
   context.fillStyle =
-    location.id === "huygens"
-      ? "#71d7d1"
-      : location.id === "ligeia"
-        ? "#77d6e8"
-        : location.id === "selk"
-          ? "#e8d16f"
-          : location.id === "ontario"
-            ? "#9de18b"
-            : location.id === "xanadu"
-              ? "#d1a7ff"
-              : location.id === "sotra"
-                ? "#ff9f76"
-                : location.id === "hotei"
-                  ? "#a3e6bc"
-                  : location.id === "menrva"
-                    ? "#f5a6bf"
-                    : location.id === "shangriLa"
-                      ? "#e9c46a"
-                      : location.id === "mithrim"
-                        ? "#9dc9ff"
-                        : location.id === "punga"
-                          ? "#84d9a5"
-                          : location.id === "vidFlumina"
-                            ? "#8de0e8"
-                            : location.id === "jingpo"
-                              ? "#8fb9ff"
-                              : "#e07a3a";
+    categoryColors.get(location.category || "Major Features") || "#e07a3a";
   context.shadowColor = "rgba(0, 0, 0, 0.8)";
   context.shadowBlur = markerSize;
   context.beginPath();
@@ -454,6 +777,15 @@ function positionLocationImage(element) {
   const globeBounds = globe.getBoundingClientRect();
   const globeLeft = globeBounds.left + globeBounds.width * 0.07;
   const availableWidth = Math.max(0, globeLeft - contentBounds.left);
+  if (availableWidth < 200) {
+    const panelWidth = Math.max(0, Math.min(320, contentBounds.width - 32));
+    element.style.left = `${(contentBounds.width - panelWidth) / 2}px`;
+    element.style.width = `${panelWidth}px`;
+    element.classList.add("globe-image-panel-centered");
+    return;
+  }
+
+  element.classList.remove("globe-image-panel-centered");
   const sidePadding = Math.min(16, availableWidth / 3);
   const panelWidth = Math.max(0, Math.min(320, availableWidth - sidePadding * 2));
   const panelCenter = contentBounds.left + availableWidth / 2;
@@ -525,7 +857,9 @@ globe.addEventListener("click", (event) => {
     if (coordinates) {
       globeSelectedCoordinates.textContent = `Selected: ${formatCoordinates(coordinates)}`;
       const bounds = globe.getBoundingClientRect();
-      for (const location of locations) {
+      let closestLocation = null;
+      let closestDistance = Infinity;
+      for (const location of getVisibleLocations()) {
         const marker = projectCoordinates(
           location.latitude,
           location.longitudeWest,
@@ -533,26 +867,18 @@ globe.addEventListener("click", (event) => {
         const markerX = bounds.left + marker.x / globe.width * bounds.width;
         const markerY = bounds.top + marker.y / globe.height * bounds.height;
         const markerHitRadius = Math.max(14, bounds.width * 0.025);
+        const distance =
+          Math.hypot(event.clientX - markerX, event.clientY - markerY);
         if (
           marker.visible &&
-          Math.hypot(event.clientX - markerX, event.clientY - markerY) <=
-            markerHitRadius
+          distance <= markerHitRadius &&
+          distance < closestDistance
         ) {
-          for (const { element } of Object.values(locationInfos)) {
-            element.hidden = true;
-          }
-          for (const [locationId, panel] of Object.entries(locationImagePanels)) {
-            panel.hidden = locationId !== location.id;
-          }
-          const info = locationInfos[location.id];
-          positionLocationInfo(info.element);
-          const imagePanel = locationImagePanels[location.id];
-          if (imagePanel) positionLocationImage(imagePanel);
-          info.element.hidden = false;
-          info.closeButton.focus();
-          break;
+          closestLocation = location;
+          closestDistance = distance;
         }
       }
+      if (closestLocation) selectLocation(closestLocation);
     }
   }
   pointerMoved = false;
@@ -571,10 +897,17 @@ for (const info of Object.values(locationInfos)) {
   });
 }
 
+closeNamedFeatureInfo.addEventListener("click", () => {
+  namedFeatureInfo.hidden = true;
+  globe.focus();
+});
+
 window.addEventListener("resize", () => {
+  if (!featureCategoryPanel.hidden) positionFeatureCategoryPanel();
   for (const { element } of Object.values(locationInfos)) {
     if (!element.hidden) positionLocationInfo(element);
   }
+  if (!namedFeatureInfo.hidden) positionLocationInfo(namedFeatureInfo);
   for (const panel of Object.values(locationImagePanels)) {
     if (!panel.hidden) positionLocationImage(panel);
   }
@@ -616,6 +949,14 @@ textureImage.addEventListener("load", () => {
 
 textureImage.addEventListener("error", () => {
   console.error("Could not load the Titan surface texture: PIA22770.jpg");
+});
+
+featureBrowserStatus.textContent = "Loading named surface features…";
+renderFeatureBrowser();
+loadNamedFeatures().catch((error) => {
+  console.error("Could not load Titan's named surface features:", error);
+  featureBrowserStatus.textContent =
+    "Could not load the feature catalog. Check that the JSON file is available and reload the page.";
 });
 
 textureImage.src = "PIA22770.jpg";
