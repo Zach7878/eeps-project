@@ -45,6 +45,48 @@
           />
           <figcaption>Huygens landing site · ESA/NASA/JPL/University of Arizona; processed by Andrey Pivovarov</figcaption>
         </figure>
+        <figure id="selkImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="20130223_ICARUS-11052R1_fig4.jpg"
+            alt="Cropped diagram of Selk Crater showing its central pit, crater floor, terrace zone, rim, and drainage channels."
+          />
+          <figcaption>Selk Crater · ESA/NASA/JPL/University of Arizona; processed by Andrey Pivovarov</figcaption>
+        </figure>
+        <figure id="ontarioImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="250px-Cassini-OntarioLacus-RADAR.png"
+            alt="Cassini radar image of Ontario Lacus, a dark lake near Titan's south pole."
+          />
+          <figcaption>Ontario Lacus · NASA/JPL-Caltech/ASI</figcaption>
+        </figure>
+        <figure id="xanaduImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="PIA08425.png"
+            alt="Cassini radar image of terrain along the margin of Xanadu on Titan."
+          />
+          <figcaption>Xanadu margin · NASA/JPL-Caltech/ASI</figcaption>
+        </figure>
+        <figure id="sotraImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="250px-Sotra_Facula.png"
+            alt="Cassini radar image of Sotra Facula, including the deep depression of Sotra Patera."
+          />
+          <figcaption>Sotra Facula · NASA/JPL-Caltech/ASI/USGS/University of Arizona</figcaption>
+        </figure>
+        <figure id="hoteiImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="hotei regio.png"
+            alt="Cassini infrared and radar views with an interpretation diagram of possible cryovolcanic flows in Hotei Regio."
+          />
+          <figcaption>Hotei Regio · NASA/JPL-Caltech/ASI/USGS/University of Arizona</figcaption>
+        </figure>
+        <figure id="menrvaImagePanel" class="globe-image-panel" hidden>
+          <img
+            src="250px-Crater_Menrva_on_Titan_2005-02-15.png"
+            alt="Cassini radar view of part of the multi-ring Menrva impact basin on Titan, taken February 15, 2005."
+          />
+          <figcaption>Menrva · Cassini radar view, February 15, 2005</figcaption>
+        </figure>
         <canvas
           id="titanGlobe"
           class="titan-globe"
@@ -229,6 +271,222 @@
             <a href="https://doi.org/10.3847/PSJ/acbe40" target="_blank" rel="noreferrer">Wakita et al. (2023)</a>,
             <a href="https://www.nasa.gov/missions/cassini/impact-craters-reveal-details-of-titans-dynamic-surface-weathering/" target="_blank" rel="noreferrer">NASA</a> and
             <a href="https://ntrs.nasa.gov/citations/20210011126" target="_blank" rel="noreferrer">NASA NTRS Dragonfly landing-site study</a>.
+          </p>
+        </aside>
+        <aside
+          id="ontarioInfo"
+          class="globe-info"
+          aria-labelledby="ontarioTitle"
+          aria-describedby="ontarioDescription"
+          hidden
+        >
+          <button
+            id="closeOntarioInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Ontario Lacus information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Titan's largest southern lake</p>
+          <h2 id="ontarioTitle">Ontario Lacus</h2>
+          <p id="ontarioDescription">
+            Ontario Lacus is the largest lake in Titan's southern hemisphere.
+            Cassini first spotted it in 2005 as a dark patch near the south
+            pole. In 2008, observations confirmed liquid ethane there—the
+            first confirmed surface liquid beyond Earth. The lake appears to
+            be evaporating, with a dark shoreline around its edge, and lies
+            within a larger basin that may once have held an ancient sea.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>72°S, 183°W</dd></div>
+            <div><dt>Length</dt><dd>About 235 km</dd></div>
+            <div><dt>Area</dt><dd>About 15,000 km²; early estimates were about 20,000 km²</dd></div>
+            <div><dt>Maximum measured depth</dt><dd>About 50 m</dd></div>
+            <div><dt>Composition</dt><dd>About 51% methane, 38% ethane, 11% nitrogen</dd></div>
+            <div><dt>Name</dt><dd>Named after Lake Ontario in North America</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noreferrer">USGS Gazetteer</a>,
+            Brown et al. (2008), Mastrogiuseppe et al. (2018), and
+            <a href="https://science.nasa.gov/" target="_blank" rel="noreferrer">NASA Science and JPL Photojournal</a>.
+          </p>
+        </aside>
+        <aside
+          id="xanaduInfo"
+          class="globe-info"
+          aria-labelledby="xanaduTitle"
+          aria-describedby="xanaduDescription"
+          hidden
+        >
+          <button
+            id="closeXanaduInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Xanadu information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Titan's largest major bright region</p>
+          <h2 id="xanaduTitle">Xanadu</h2>
+          <p id="xanaduDescription">
+            Xanadu is an enormous bright equatorial region, first identified
+            by Hubble in 1994 and later revealed by Cassini to be one of
+            Titan's most geologically complex landscapes. Unlike the
+            surrounding dark dune fields, it has rugged mountains, deep
+            valleys, branching river channels and broad basins. Drainage
+            networks suggest methane rainfall helped shape its surface.
+            Tectonic deformation, erosion and possibly cryovolcanism have
+            modified this ancient terrain.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>About 10°S, 100°W</dd></div>
+            <div><dt>Dimensions</dt><dd>About 4,000 × 2,500 km</dd></div>
+            <div><dt>Feature type</dt><dd>Bright equatorial geological province</dd></div>
+            <div><dt>Terrain</dt><dd>Mountains, valleys, river channels and basins</dd></div>
+            <div><dt>Local relief</dt><dd>Some mountain ranges rise more than 2 km</dd></div>
+            <div><dt>First identified</dt><dd>1994, by Hubble</dd></div>
+            <div><dt>Name</dt><dd>Xanadu, the legendary paradise in Coleridge's “Kubla Khan”</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noreferrer">USGS Gazetteer</a>;
+            Radebaugh et al. (2011);
+            <a href="https://science.nasa.gov/resource/radar-images-the-margin-of-xanadu/" target="_blank" rel="noreferrer">NASA/JPL radar images of the margin of Xanadu</a>;
+            Matteoni et al. (2020).
+          </p>
+        </aside>
+        <aside
+          id="sotraInfo"
+          class="globe-info"
+          aria-labelledby="sotraTitle"
+          aria-describedby="sotraDescription"
+          hidden
+        >
+          <button
+            id="closeSotraInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Sotra Patera information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Possible ice volcano</p>
+          <h2 id="sotraTitle">Sotra Patera</h2>
+          <p id="sotraDescription">
+            Sotra Patera is a deep depression and one of Titan's strongest
+            cryovolcano candidates. Nearby Doom Mons rises beside a large
+            flow-like feature called Mohini Fluctus. Cassini first saw this
+            region as a bright spot nicknamed “The Rose”; later 3D height maps
+            revealed its deep pit and high peaks. A 2013 study argued that
+            the pit, mountains and flows may have formed through
+            cryovolcanism, though the evidence remains debated.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>14.5°S, 40°W</dd></div>
+            <div><dt>Diameter</dt><dd>About 40 km</dd></div>
+            <div><dt>Depth</dt><dd>About 1.7 km; the deepest known pit on Titan</dd></div>
+            <div><dt>Neighbor</dt><dd>Doom Mons, about 1,450 m high and 70 km across</dd></div>
+            <div><dt>Former name</dt><dd>Sotra Facula; renamed December 19, 2012</dd></div>
+            <div><dt>Name</dt><dd>Sotra, an island in Norway</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noreferrer">USGS Gazetteer</a>;
+            Lopes et al. (2013);
+            <a href="https://photojournal.jpl.nasa.gov/catalog/PIA13695" target="_blank" rel="noreferrer">NASA/JPL Photojournal PIA13695</a>;
+            <a href="https://science.nasa.gov/" target="_blank" rel="noreferrer">NASA Science</a>;
+            Inside Science; MacKenzie et al. (arXiv).
+          </p>
+        </aside>
+        <aside
+          id="hoteiInfo"
+          class="globe-info"
+          aria-labelledby="hoteiTitle"
+          aria-describedby="hoteiDescription"
+          hidden
+        >
+          <button
+            id="closeHoteiInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Hotei Regio information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Possible ice-volcano basin</p>
+          <h2 id="hoteiTitle">Hotei Regio</h2>
+          <p id="hoteiDescription">
+            Hotei Regio is a large region in Titan's southern hemisphere and
+            one of the leading candidates for ice volcanism. Its central low
+            basin contains lobe-shaped deposits that some researchers
+            interpret as thick, slow-moving cryovolcanic flows. Bright
+            infrared features, mountain-ringed terrain, and channels
+            descending from the mountains add to the evidence. The
+            interpretation remains debated: the deposits may instead have
+            formed from surface liquids, or the bright basin may be an
+            evaporated ancient seabed.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>26°S, 78°W</dd></div>
+            <div><dt>Size</dt><dd>About 500 km (USGS); up to 700 km in a 2009 study</dd></div>
+            <div><dt>Flow thickness</dt><dd>About 100–200 m</dd></div>
+            <div><dt>Surrounding mountains</dt><dd>About 1 km high</dd></div>
+            <div><dt>Southern edge</dt><dd>Hotei Arcus</dd></div>
+            <div><dt>Name</dt><dd>Named in 2009 for Hotei, the Japanese god of contentment and good fortune</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noreferrer">USGS Gazetteer</a>;
+            Soderblom et al. (2009);
+            <a href="https://www.nasa.gov/" target="_blank" rel="noreferrer">NASA: “Agreement at Hotei Regio”</a>;
+            Lopes et al. (2013); MacKenzie et al. (2014).
+          </p>
+        </aside>
+        <aside
+          id="menrvaInfo"
+          class="globe-info"
+          aria-labelledby="menrvaTitle"
+          aria-describedby="menrvaDescription"
+          hidden
+        >
+          <button
+            id="closeMenrvaInfo"
+            class="globe-info-close"
+            type="button"
+            aria-label="Close Menrva information"
+          >
+            ×
+          </button>
+          <p class="eyebrow">Titan's largest confirmed impact crater</p>
+          <h2 id="menrvaTitle">Menrva</h2>
+          <p id="menrvaDescription">
+            Menrva is a vast multi-ring impact basin and the largest clearly
+            identified impact structure on Titan. Its broad outer rim,
+            surrounding depressions, and raised rugged center suggest a
+            powerful impact that deformed the icy crust. Cassini radar images
+            reveal radial grooves and channels along parts of its inner walls,
+            while smoother areas may have been covered by later deposits.
+            Erosion, methane rainfall, sediment transport, and dunes have
+            since modified the basin. Impact models suggest the collision
+            could have melted subsurface ice and connected surface organics
+            with Titan's underground ocean.
+          </p>
+          <dl class="globe-info-facts">
+            <div><dt>Coordinates</dt><dd>20.1°N, 87.2°W</dd></div>
+            <div><dt>Official diameter</dt><dd>About 392 km</dd></div>
+            <div><dt>Outer structure</dt><dd>About 425–450 km across</dd></div>
+            <div><dt>Feature type</dt><dd>Multi-ring impact basin</dd></div>
+            <div><dt>First identified</dt><dd>2005, in Cassini radar observations</dd></div>
+            <div><dt>Name</dt><dd>Menrva, the Etruscan goddess of wisdom</dd></div>
+          </dl>
+          <p class="globe-info-source">
+            Sources:
+            <a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noreferrer">USGS Gazetteer</a>;
+            Wood et al. (2010); Williams et al. (2011); Neish et al. (2013);
+            “Modeling the formation of Menrva impact crater on Titan” (2021);
+            <a href="https://en.wikipedia.org/wiki/Menrva_(crater)" target="_blank" rel="noreferrer">Cassini view and references</a>.
           </p>
         </aside>
       </section>

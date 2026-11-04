@@ -3,6 +3,12 @@ const globeContent = document.querySelector(".globe-content");
 const krakenImagePanel = document.getElementById("krakenImagePanel");
 const ligeiaImagePanel = document.getElementById("ligeiaImagePanel");
 const huygensImagePanel = document.getElementById("huygensImagePanel");
+const selkImagePanel = document.getElementById("selkImagePanel");
+const ontarioImagePanel = document.getElementById("ontarioImagePanel");
+const xanaduImagePanel = document.getElementById("xanaduImagePanel");
+const sotraImagePanel = document.getElementById("sotraImagePanel");
+const hoteiImagePanel = document.getElementById("hoteiImagePanel");
+const menrvaImagePanel = document.getElementById("menrvaImagePanel");
 const context = globe.getContext("2d");
 const locationInfos = {
   kraken: {
@@ -20,6 +26,26 @@ const locationInfos = {
   selk: {
     element: document.getElementById("selkInfo"),
     closeButton: document.getElementById("closeSelkInfo"),
+  },
+  ontario: {
+    element: document.getElementById("ontarioInfo"),
+    closeButton: document.getElementById("closeOntarioInfo"),
+  },
+  xanadu: {
+    element: document.getElementById("xanaduInfo"),
+    closeButton: document.getElementById("closeXanaduInfo"),
+  },
+  sotra: {
+    element: document.getElementById("sotraInfo"),
+    closeButton: document.getElementById("closeSotraInfo"),
+  },
+  hotei: {
+    element: document.getElementById("hoteiInfo"),
+    closeButton: document.getElementById("closeHoteiInfo"),
+  },
+  menrva: {
+    element: document.getElementById("menrvaInfo"),
+    closeButton: document.getElementById("closeMenrvaInfo"),
   },
 };
 const textureImage = new Image();
@@ -67,11 +93,57 @@ const selkCrater = {
   latitude: 7,
   longitudeWest: 199,
 };
-const locations = [krakenMare, huygensLandingSite, ligeiaMare, selkCrater];
+const ontarioLacus = {
+  id: "ontario",
+  name: "Ontario Lacus",
+  latitude: -72,
+  longitudeWest: 183,
+};
+const xanadu = {
+  id: "xanadu",
+  name: "Xanadu",
+  latitude: -10,
+  longitudeWest: 100,
+};
+const sotraPatera = {
+  id: "sotra",
+  name: "Sotra Patera",
+  latitude: -14.5,
+  longitudeWest: 40,
+};
+const hoteiRegio = {
+  id: "hotei",
+  name: "Hotei Regio",
+  latitude: -26,
+  longitudeWest: 78,
+};
+const menrva = {
+  id: "menrva",
+  name: "Menrva",
+  latitude: 20.1,
+  longitudeWest: 87.2,
+};
+const locations = [
+  krakenMare,
+  huygensLandingSite,
+  ligeiaMare,
+  selkCrater,
+  ontarioLacus,
+  xanadu,
+  sotraPatera,
+  hoteiRegio,
+  menrva,
+];
 const locationImagePanels = {
   kraken: krakenImagePanel,
   huygens: huygensImagePanel,
   ligeia: ligeiaImagePanel,
+  selk: selkImagePanel,
+  ontario: ontarioImagePanel,
+  xanadu: xanaduImagePanel,
+  sotra: sotraImagePanel,
+  hotei: hoteiImagePanel,
+  menrva: menrvaImagePanel,
 };
 
 function scheduleDraw(scale = 1) {
@@ -213,6 +285,16 @@ function drawLocationMarker(location) {
         ? "#77d6e8"
         : location.id === "selk"
           ? "#e8d16f"
+          : location.id === "ontario"
+            ? "#9de18b"
+            : location.id === "xanadu"
+              ? "#d1a7ff"
+              : location.id === "sotra"
+                ? "#ff9f76"
+                : location.id === "hotei"
+                  ? "#a3e6bc"
+                  : location.id === "menrva"
+                    ? "#f5a6bf"
           : "#e07a3a";
   context.shadowColor = "rgba(0, 0, 0, 0.8)";
   context.shadowBlur = markerSize;
