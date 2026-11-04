@@ -234,6 +234,10 @@ function getVisibleLocations() {
   ];
 }
 
+function getCategoryDisplayName(category) {
+  return category.replace(/^Albedo features\s*[—–-]\s*/i, "");
+}
+
 function parseFeatureCoordinates(value) {
   const coordinates = String(value).split("/")[0].replace(/\uFEFF/g, " ");
   const match = coordinates.match(
@@ -304,7 +308,7 @@ function addFeatureFact(label, value) {
 
 function showNamedFeatureInfo(feature) {
   hideFeatureInfo();
-  namedFeatureCategory.textContent = feature.category;
+  namedFeatureCategory.textContent = getCategoryDisplayName(feature.category);
   namedFeatureTitle.textContent = feature.name;
   namedFeatureFacts.replaceChildren();
   addFeatureFact(
@@ -371,10 +375,11 @@ function renderFeatureBrowser() {
     button.type = "button";
     button.className = "feature-category-button";
     button.dataset.category = category.name;
-    button.textContent = `${category.name} (${category.features.length})`;
+    const displayName = getCategoryDisplayName(category.name);
+    button.textContent = `${displayName} (${category.features.length})`;
     button.setAttribute(
       "aria-label",
-      `${category.name}, ${category.features.length} features`,
+      `${displayName}, ${category.features.length} features`,
     );
     button.setAttribute(
       "aria-pressed",
